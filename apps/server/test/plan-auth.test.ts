@@ -108,6 +108,71 @@ test('missing plan scopes, invalid token shape and raw endpoint errors are safel
   await assert.rejects(f.attempt.complete(f.callback()), (error: Error) => !error.message.includes('private-refresh'));
 });
 
+test('token endpoint diagnostics distinguish restrictions and configuration without leaking raw responses', async () => {
+  const cases = [
+    { status: 403, body: { error: { code: 'unsupported_country_region_territory', message: 'private-email-token' } }, code: 'access_restricted', expected: 'unsupported_country_region_territory' },
+    { status: 400, body: { error: 'invalid_client', error_description: 'private-email-token' }, code: 'configuration', expected: 'invalid_client' },
+    { status: 400, body: { error: 'invalid_grant' }, code: 'sign_in_required', expected: 'invalid_grant' },
+    { status: 429, body: { detail: 'private-email-token' }, code: 'network', expected: 'JSON 响应' },
+    { status: 400, body: { error: 'temporarily_unavailable' }, code: 'network', expected: 'temporarily_unavailable' },
+    { status: 400, body: { error: 'server_error' }, code: 'network', expected: 'server_error' },
+    { status: 403, body: { error: { code: 'private-email-token', message: 'private-email-token' } }, code: 'access_restricted', expected: 'JSON 响应' },
+  ] as const;
+  for (const item of cases) {
+    const f = fixture({ status: item.status, tokens: item.body });
+    await assert.rejects(f.attempt.complete(f.callback()), (error: unknown) => {
+      assert.ok(error instanceof PlanAuthError);
+      assert.equal(error.code, item.code);
+      assert.match(error.message, new RegExp(`HTTP ${item.status}`));
+      assert.ok(error.message.includes(item.expected));
+      assert.ok(!error.message.includes('private-email-token'));
+      return true;
+    });
+    assert.equal(f.calls.length, 1);
+  }
+});
+
+test('non-JSON and oversized endpoint failures stay bounded and do not expose response content', async () => {
+  for (const body of ['<!DOCTYPE html>private-email-token', JSON.stringify({ error: 'private-email-token'.repeat(5000) })]) {
+    const oauth = new PlanOAuth({ fetch: (async () => new Response(body, { status: 403,
+      headers: { 'x-request-id': 'request-test-123' } })) as typeof fetch });
+    await assert.rejects(oauth.requestTokens({ grant_type: 'test' }), (error: unknown) => {
+      assert.ok(error instanceof PlanAuthError);
+      assert.equal(error.code, 'access_restricted');
+      assert.match(error.message, /HTTP 403/);
+      assert.match(error.message, /非 JSON 或不可读响应/);
+      assert.match(error.message, /request-test-123/);
+      assert.ok(!error.message.includes('private-email-token'));
+      return true;
+    });
+  }
+});
+
+test('a region-restricted refresh preserves the existing profile and performs no automatic retry', async () => {
+  const store = memoryStore(profile({ expiresAt: now - 1 }));
+  const f = fixture({ status: 403, tokens: { error: { code: 'unsupported_country_region_territory' } } });
+  const provider = new StoredPlanCredentialProvider(store, f.oauth, () => now);
+  const before = await store.read();
+  await assert.rejects(provider.acquire(true), (error: unknown) => error instanceof PlanAuthError && error.code === 'access_restricted');
+  assert.equal(f.calls.length, 1);
+  assert.equal(store.writes.length, 0);
+  assert.deepEqual(await store.read(), before);
+});
+
+test('invalid or oversized diagnostic request IDs never reach display messages', async () => {
+  for (const id of ['private@example.invalid', 'a'.repeat(101)]) {
+    const oauth = new PlanOAuth({ fetch: (async () => new Response('{}', {
+      status: 403, headers: { 'x-request-id': id },
+    })) as typeof fetch });
+    await assert.rejects(oauth.requestTokens({ grant_type: 'test' }), (error: unknown) => {
+      assert.ok(error instanceof PlanAuthError);
+      assert.ok(!error.message.includes(id));
+      assert.ok(!error.message.includes('请求 ID'));
+      return true;
+    });
+  }
+});
+
 test('jose validates signature, issuer, audience, expiry, nonce, subject and authorized party', async () => {
   const { publicKey, privateKey } = await generateKeyPair('RS256');
   const jwk = await exportJWK(publicKey); jwk.kid = 'offline-test';

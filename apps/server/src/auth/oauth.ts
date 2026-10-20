@@ -62,6 +62,47 @@ async function boundedJson(response: Response): Promise<unknown> {
   } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
 }
 
+// Never display endpoint descriptions or arbitrary fields: they can contain credentials.
+const knownOAuthErrors = new Set([
+  'invalid_request', 'invalid_grant', 'invalid_client', 'unauthorized_client',
+  'unsupported_grant_type', 'access_denied', 'unsupported_country_region_territory',
+  'invalid_refresh_token', 'token_expired', 'refresh_token_expired',
+  'refresh_token_invalidated', 'refresh_token_reused', 'server_error', 'temporarily_unavailable',
+]);
+async function tokenEndpointFailure(response: Response): Promise<PlanAuthError> {
+  let format = '非 JSON 或不可读响应';
+  let endpointCode: string | undefined;
+  try {
+    const value = await boundedJson(response);
+    format = 'JSON 响应';
+    const parsed = z.object({
+      error: z.union([z.string(), z.object({ code: z.string().optional() })]).optional(),
+    }).safeParse(value);
+    if (parsed.success) {
+      const candidate = typeof parsed.data.error === 'string' ? parsed.data.error : parsed.data.error?.code;
+      if (candidate && knownOAuthErrors.has(candidate)) endpointCode = candidate;
+    }
+  } catch { /* Retain only the HTTP status and coarse format for untrusted/oversized bodies. */ }
+  const requestId = response.headers.get('x-request-id');
+  const diagnostic = `（HTTP ${response.status}；${endpointCode ?? format}${
+    requestId && /^[a-zA-Z0-9_-]{1,100}$/.test(requestId) ? `；请求 ID ${requestId}` : ''}）`;
+  if (endpointCode === 'unsupported_country_region_territory') {
+    return new PlanAuthError('access_restricted',
+      `OpenAI 不支持当前请求所在的国家或地区。请核对官方服务支持范围；重复登录无法解除这项限制。${diagnostic}`);
+  }
+  if (['invalid_client', 'unauthorized_client', 'unsupported_grant_type'].includes(endpointCode ?? '')) {
+    return new PlanAuthError('configuration', `ChatGPT 客户端注册或授权请求配置不兼容，请先修正配置。${diagnostic}`);
+  }
+  if (response.status >= 500 || [408, 429].includes(response.status)
+      || ['server_error', 'temporarily_unavailable'].includes(endpointCode ?? '')) {
+    return new PlanAuthError('network', `ChatGPT 授权服务暂时不可用，请稍后重试。${diagnostic}`);
+  }
+  if (response.status === 403 || endpointCode === 'access_denied') {
+    return new PlanAuthError('access_restricted', `ChatGPT 授权请求被拒绝，请先核对服务和账号支持条件。${diagnostic}`);
+  }
+  return new PlanAuthError('sign_in_required', `ChatGPT 授权未完成，请根据诊断检查请求后重新登录。${diagnostic}`);
+}
+
 /** A single-use transaction remains memory-only, including its PKCE verifier. */
 export class PlanSignInAttempt {
   readonly authorizationUrl: string;
@@ -164,9 +205,7 @@ export class PlanOAuth {
         body: new URLSearchParams(body), signal: AbortSignal.any([AbortSignal.timeout(15_000), ...(signal ? [signal] : [])]),
       });
       if (!response.ok) {
-        await response.body?.cancel().catch(() => {});
-        throw new PlanAuthError(response.status >= 500 || [408, 429].includes(response.status) ? 'network' : 'sign_in_required',
-          response.status >= 500 || [408, 429].includes(response.status) ? 'ChatGPT 授权服务暂时不可用，请稍后重试。' : 'ChatGPT 授权已失效或未获许可，请重新登录本应用。');
+        throw await tokenEndpointFailure(response);
       }
       const parsed = Tokens.safeParse(await boundedJson(response));
       if (!parsed.success) throw new PlanAuthError('invalid_response', 'ChatGPT 授权响应格式不兼容，未更新凭据。');

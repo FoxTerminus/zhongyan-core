@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6111,
-      "sha256": "ebbba4971e165b5e9ac205090c1319d5aaa70a78352422e0bfc1a2fe39343479"
+      "bytes": 6976,
+      "sha256": "99377499ecb8034e0e1c54c05a495b12ba28f964f0606735d167b4076b336de1"
     },
     {
       "path": "apps/server/package.json",
@@ -50,13 +50,13 @@
     },
     {
       "path": "apps/server/src/auth/loopback.ts",
-      "bytes": 4325,
-      "sha256": "68153db45744215f5b455b20e926d5f2a035a60464d7bf906bb6d9eea4c006f6"
+      "bytes": 4482,
+      "sha256": "ff1122b34efcafe858cee0f99edb4749d46fc67e73e8c8420a1a5f012993bb91"
     },
     {
       "path": "apps/server/src/auth/oauth.ts",
-      "bytes": 11638,
-      "sha256": "f5bd782833c75cac22a540f035a73b15690f7cf973bb8453474b8f0a8d4927db"
+      "bytes": 13899,
+      "sha256": "e7b0c7da9637189ff4ad763017bf11295a5d83ee6d1c874589eaac8e79b03784"
     },
     {
       "path": "apps/server/src/auth/profile-store.ts",
@@ -75,8 +75,8 @@
     },
     {
       "path": "apps/server/src/auth/types.ts",
-      "bytes": 2274,
-      "sha256": "d6acd2aaeb00785573694db9104c2b8d800990aa1a1c501c2c8f1ca9ec4f7963"
+      "bytes": 2314,
+      "sha256": "dc60a86d1d07b882487a6fbc444314aa563fd580215f662f9c4d84382d3ed5d4"
     },
     {
       "path": "apps/server/src/config.ts",
@@ -225,13 +225,13 @@
     },
     {
       "path": "apps/server/test/plan-auth.test.ts",
-      "bytes": 13550,
-      "sha256": "baefe17bfe26ac904e4e85ab4bfe44cade108e2c7ed30e09b641845599bfe3a1"
+      "bytes": 17358,
+      "sha256": "ccdfb0c5e21fe0897222e25badb9bf446d74619ad9af5086dc481734f1ee9c7d"
     },
     {
       "path": "apps/server/test/plan-loopback.test.ts",
-      "bytes": 3602,
-      "sha256": "25adc5784c71ebdec3fd57d2d05a29822fae580e305f8927afce4ba4523cef6d"
+      "bytes": 4906,
+      "sha256": "cbe0774c8197c7cf0e2366af6debdcff23b0ed5cfec0e47f574bd01e4c9190b8"
     },
     {
       "path": "apps/server/test/profile-store.test.ts",
@@ -345,13 +345,13 @@
     },
     {
       "path": "deploy/preflight.mjs",
-      "bytes": 4880,
-      "sha256": "39ed772d418e412530ef2dd399b91da119dfc105ac40a1a162b9863ddb895ff0"
+      "bytes": 6289,
+      "sha256": "fcc55a1a9a236d6cfc04276a0e177f9eeff2dbf88a86002228c2799e4f3944d5"
     },
     {
       "path": "deploy/prepare.mjs",
-      "bytes": 1346,
-      "sha256": "5c986320a27a186d1f729a1ca4406f9789c80522710a2324ff998758f2bad7ae"
+      "bytes": 1962,
+      "sha256": "59e2f97fa25ea22a423ffc8559483289c78197fc571cbb9e71490d57b66d6354"
     },
     {
       "path": "deploy/read-secret.mjs",
@@ -375,8 +375,8 @@
     },
     {
       "path": "deploy/release-content/README.md",
-      "bytes": 6111,
-      "sha256": "ebbba4971e165b5e9ac205090c1319d5aaa70a78352422e0bfc1a2fe39343479"
+      "bytes": 6976,
+      "sha256": "99377499ecb8034e0e1c54c05a495b12ba28f964f0606735d167b4076b336de1"
     },
     {
       "path": "deploy/release-content/ci.yml",
@@ -410,8 +410,8 @@
     },
     {
       "path": "deploy/test/read-secret.test.mjs",
-      "bytes": 1501,
-      "sha256": "9e044f039fc697e4f4f0b6ce751e5f8f4865f8bbf96cacbf7c577b5e18a77f43"
+      "bytes": 6836,
+      "sha256": "2d188c4a1548b1adff3d94ca01a7f40eb408ba7272909542677887ffe744e1f2"
     },
     {
       "path": "deploy/test/tls-config.test.mjs",

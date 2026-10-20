@@ -38,7 +38,9 @@ export async function authorizePlanProfile(store: LoginStore, options: {
             await store.write(profile);
             respond(response, 200, 'ChatGPT authorization saved for this application. You may close this window.');
           } catch (error) {
-            respond(response, 400, 'Sign-in could not be completed. Return to the administrator terminal.');
+            respond(response, 400, error instanceof PlanAuthError
+              ? `未能完成 ChatGPT 授权。\n${error.message}\n\n请返回终焉查看处理进度。`
+              : '未能安全保存本应用授权，请返回终焉检查目录权限。');
             throw error instanceof PlanAuthError ? error : new PlanAuthError('storage', '未能安全保存本应用授权，请检查权限后重新登录。');
           }
         })();

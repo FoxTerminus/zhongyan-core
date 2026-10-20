@@ -22,7 +22,7 @@ export function isPlanHostId(value: unknown): value is string {
 export const PLAN_SCOPE = 'chatgpt.tokens.use.direct';
 export const PLAN_SCOPES = ['openid', 'profile', 'email', 'offline_access', 'resource.invoke', PLAN_SCOPE];
 export class PlanAuthError extends Error {
-  constructor(public readonly code: 'sign_in_required' | 'invalid_response' | 'network' | 'cancelled' | 'storage' | 'busy', message: string) {
+  constructor(public readonly code: 'sign_in_required' | 'invalid_response' | 'network' | 'cancelled' | 'storage' | 'busy' | 'access_restricted' | 'configuration', message: string) {
     super(message); this.name = 'PlanAuthError';
   }
 }

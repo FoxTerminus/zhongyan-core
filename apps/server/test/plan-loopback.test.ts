@@ -39,6 +39,29 @@ test('administrator cancellation closes pending loopback without token exchange 
   await assert.rejects(fetch(redirectUri));
 });
 
+test('loopback explains a restricted token exchange without saving credentials or revealing raw errors', async () => {
+  const store = memoryStore();
+  const denied = new PlanOAuth({ fetch: (async () => new Response(JSON.stringify({
+    error: { code: 'unsupported_country_region_territory', message: 'private-token-value' },
+  }), { status: 403 })) as typeof fetch });
+  let responseBody: Promise<string> | undefined;
+  const login = authorizePlanProfile(store, { onReady(url) {
+    const auth = new URL(url); const callback = new URL(auth.searchParams.get('redirect_uri')!);
+    callback.search = new URLSearchParams({ code: 'test', state: auth.searchParams.get('state')!, client_id: 'issued-client' }).toString();
+    responseBody = fetch(callback).then(async response => {
+      assert.equal(response.status, 400);
+      assert.equal(response.headers.get('cache-control'), 'no-store');
+      return response.text();
+    });
+  } }, denied);
+  await assert.rejects(login, (error: unknown) => error instanceof PlanAuthError && error.code === 'access_restricted');
+  const text = await responseBody;
+  assert.ok(text?.includes('unsupported_country_region_territory'));
+  assert.ok(!text?.includes('private-token-value'));
+  assert.equal(store.writes.length, 0);
+  assert.equal(store.locked, false);
+});
+
 test('cancellation keeps lock until an already started credential commit settles', async () => {
   const store = memoryStore(); const controller = new AbortController();
   let releaseWrite = () => {}; const writeGate = new Promise<void>(resolve => { releaseWrite = resolve; });

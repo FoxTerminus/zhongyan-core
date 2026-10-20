@@ -43,9 +43,13 @@ npm run dev:server
 
 先阅读 `deploy/deployment.env.example` 与部署模板。`node deploy/preflight.mjs --help` 只显示只读预检说明；`node deploy/prepare.mjs` 则会创建本地部署配置与随机密钥。模板不等于已购买服务器、部署成功、HTTPS 可用或模型已接通。
 
+完整预检在目标 Linux 主机运行，需要满足项目 engines 的宿主 Node.js 以及可访问的 Docker/Compose；不能仅在未连接宿主 Docker 的应用容器里完成。Compose 文件密钥使用 `deploy/.secrets` 目录 0700、其中两枚密钥文件 0444，让非 root 容器读取而保持宿主目录私有。准备工具明确设置新文件权限，不改动既有密钥文件；预检拒绝不匹配的权限并给出修正命令。目标 Linux 上应执行 `node --test deploy/test/read-secret.test.mjs`，Windows 跳过的 POSIX 测试不能算作 Linux 验收。
+
 本包的 `deploy/Dockerfile` 使用核心专属工作区配置，保留服务端构建输入和运行时边界。可选 `deploy/compose.plan.yaml` 叠加独立运行器配置，`deploy/https-ip.md` 说明域名与 IP 的 HTTPS 选择。运行器镜像的 CLI 版本通过构建参数显式更新。部署运行器、公开网络入口、持久化与恢复应按具体部署配置验收。源码打包不会触发这些操作，也不会进行真实授权。
 
 ChatGPT 套餐接入需要按适用的官方流程完成应用身份、授权及一次真实推理验证；登录成功或发现模型列表不能替代推理验证。采用 MIT 许可也不自动满足服务方对开源应用的全部接入要求。
+
+账号、工作区及实际使用地区还须满足服务方的支持条件；选择服务器地区不能单独证明资格。授权端点的地区或权限拒绝应明确呈现，停止重复登录，按官方说明处理；错误正文与凭据不会写入诊断。
 
 - [Sign in with ChatGPT quickstart](https://developers.openai.com/siwc/quickstart)
 - [开源应用与 Codex app-server](https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server)
