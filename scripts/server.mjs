@@ -1,0 +1,13 @@
+import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('../', import.meta.url));
+const production = process.argv.includes('--production');
+const args = [];
+if (existsSync(new URL('../.env', import.meta.url))) args.push('--env-file=.env');
+if (!production) args.push('--import', 'tsx', '--watch');
+args.push(production ? 'apps/server/dist/main.js' : 'apps/server/src/main.ts');
+const child = spawn(process.execPath, args, { cwd: root, stdio: 'inherit', shell: false, windowsHide: true });
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
+child.on('error', () => { console.error('无法启动服务。'); process.exitCode = 1; });
+child.on('exit', code => { process.exitCode = code ?? 1; });

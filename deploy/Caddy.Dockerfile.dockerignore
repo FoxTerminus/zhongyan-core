@@ -1,0 +1,4 @@
+**
+!deploy/
+!deploy/Caddyfile
+!deploy/Caddyfile.ip

@@ -1,0 +1,28 @@
+{
+  "name": "personal-agent-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/server",
+    "packages/contracts"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "npm run build -w @personal-agent/contracts && npm run build -w @personal-agent/server",
+    "typecheck": "npm run build -w @personal-agent/contracts && npm run typecheck --workspaces --if-present",
+    "test": "npm run build -w @personal-agent/contracts && npm run test --workspaces --if-present",
+    "dev:server": "npm run build -w @personal-agent/contracts && node scripts/server.mjs",
+    "setup": "node scripts/setup.mjs",
+    "start": "node scripts/server.mjs --production",
+    "test:packaging": "node --test deploy/test/package-release.test.mjs",
+    "test:deployment": "node --test deploy/test/*.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "~6.0.3",
+    "tsx": "4.23.15"
+  }
+}

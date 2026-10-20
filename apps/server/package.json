@@ -1,0 +1,20 @@
+{
+  "name": "@personal-agent/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "plan:login": "node dist/auth/cli.js"
+  },
+  "dependencies": {
+    "@personal-agent/contracts": "0.1.0",
+    "fastify": "5.12.7",
+    "jose": "6.2.13",
+    "zod": "4.6.7"
+  }
+}

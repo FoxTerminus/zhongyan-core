@@ -1,0 +1,23 @@
+# Allowlist the actual build inputs. Never send local databases/auth to a builder.
+**
+!package.json
+!package-lock.json
+!apps/
+!apps/server/
+!apps/server/**
+!packages/
+!packages/contracts/
+!packages/contracts/**
+!deploy/
+!deploy/entrypoint.mjs
+!deploy/read-secret.mjs
+**/node_modules
+**/dist
+**/.env*
+**/.data
+**/.cache
+**/.codex
+**/*.sqlite*
+**/*.db
+**/auth.json
+**/*.log

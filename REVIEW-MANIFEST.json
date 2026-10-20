@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 1,
+  "purpose": "local-source-release",
+  "scope": "server-core",
+  "publicationApproved": true,
+  "licenseStatus": "MIT",
+  "repository": "https://github.com/FoxTerminus/zhongyan-core",
+  "modelAuthorizationEligibility": "not-verified-by-packaging",
+  "coverage": "payload files only; this manifest does not hash itself",
+  "files": [
+    {
+      "path": ".env.example",
+      "bytes": 1111,
+      "sha256": "beda8fbbc4309561c1657ae68a2450318e28097d389098158610b028e38e73e8"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 218,
+      "sha256": "9954b73f6a276f1d64b816ee689226c1cb5514577cfdb694861435fd6af2a25b"
+    },
+    {
+      "path": ".npmrc",
+      "bytes": 35,
+      "sha256": "502ec37862ecaefb538c1544e37b857cf49374cdb1ea3df06a92561da916b336"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1103,
+      "sha256": "f7609cddd9f331d3056618326e1e6f98a7157e2ddb7c73c0432367cd13a780f2"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6111,
+      "sha256": "ebbba4971e165b5e9ac205090c1319d5aaa70a78352422e0bfc1a2fe39343479"
+    },
+    {
+      "path": "apps/server/package.json",
+      "bytes": 513,
+      "sha256": "1f5262b4023a942837b8634202adf7a2e644417a2785b4513684ce92882ebd3d"
+    },
+    {
+      "path": "apps/server/src/app.ts",
+      "bytes": 5861,
+      "sha256": "3932cab40ab271610e30ba58f4f0bfbb1762cac8b09185cadbd2ecec24b1e9fc"
+    },
+    {
+      "path": "apps/server/src/auth/cli.ts",
+      "bytes": 3970,
+      "sha256": "406c593a1ba3b2ec79cb5f926509f015f1d30cad07b0db46377473bca866e6ff"
+    },
+    {
+      "path": "apps/server/src/auth/loopback.ts",
+      "bytes": 4325,
+      "sha256": "68153db45744215f5b455b20e926d5f2a035a60464d7bf906bb6d9eea4c006f6"
+    },
+    {
+      "path": "apps/server/src/auth/oauth.ts",
+      "bytes": 11278,
+      "sha256": "9195445479a2f0b98534b3c6a1dc8e4b6499d74eda2323982bc029216ba8c85b"
+    },
+    {
+      "path": "apps/server/src/auth/profile-store.ts",
+      "bytes": 14172,
+      "sha256": "d56b519c76fd2a391a07389a6dd14b6d85ff42060c8e92259027035a6846865d"
+    },
+    {
+      "path": "apps/server/src/auth/profile-transfer.ts",
+      "bytes": 2008,
+      "sha256": "91668d4b629543a077b33d7da0a67f913182dc262312ca9ff91316360c3bacee"
+    },
+    {
+      "path": "apps/server/src/auth/provider.ts",
+      "bytes": 3542,
+      "sha256": "11545fac3bb7f1dea11ce60d67fdd0e976fc179d6225bb51cbd7c261a9e33571"
+    },
+    {
+      "path": "apps/server/src/auth/types.ts",
+      "bytes": 1750,
+      "sha256": "2500946cd048c465dd33afe67c39b0f8b3366998287af6e2504bb2d019b36774"
+    },
+    {
+      "path": "apps/server/src/config.ts",
+      "bytes": 2948,
+      "sha256": "5954da9b8b01ee8b444f79130e53cf0d10b0650e438d08246f918795075c3eba"
+    },
+    {
+      "path": "apps/server/src/errors.ts",
+      "bytes": 161,
+      "sha256": "0037b893a181d8274457d010b1cb5e0fe97cc0739e7cbbcc09ebe59c71e7db09"
+    },
+    {
+      "path": "apps/server/src/knowledge.ts",
+      "bytes": 8996,
+      "sha256": "181301f0bb00b30bd4858c4ad53657227b69546ea82d4e0d326bd30673761f5c"
+    },
+    {
+      "path": "apps/server/src/main.ts",
+      "bytes": 2336,
+      "sha256": "44d9b54e766538d4e83ba68b49ba8f208d26c61bdbc35ca312f354d01bee782f"
+    },
+    {
+      "path": "apps/server/src/runner/config.ts",
+      "bytes": 2253,
+      "sha256": "520f13f86c4771a5d5827c0c6cac449181b453ad988ddd907d69687dd36c07fb"
+    },
+    {
+      "path": "apps/server/src/runner/main.ts",
+      "bytes": 1419,
+      "sha256": "4af6325ad6055ddd88d149ee4f236583a2e293b1769f2395a3aebc4880ebefd1"
+    },
+    {
+      "path": "apps/server/src/runner/runtime.ts",
+      "bytes": 3808,
+      "sha256": "4230b9101a833433adc72b7d56ab9ddb7942a90223a05323750e3e0ff37afa76"
+    },
+    {
+      "path": "apps/server/src/runner/server.ts",
+      "bytes": 9845,
+      "sha256": "344bae4896ceaa7ec79e380c60a6bf2ce0c173c507211120f3f3bdb1d9abe9df"
+    },
+    {
+      "path": "apps/server/src/runtime/README.md",
+      "bytes": 6834,
+      "sha256": "cb1f3e394614c3abbf0dab9f2e68c6fe5deef34e31f79ca2c0425ca142b3900b"
+    },
+    {
+      "path": "apps/server/src/runtime/codex-tools.ts",
+      "bytes": 1198,
+      "sha256": "73319322cb02dcc13688f4cdd0f093b919f1ef582d16d4df3d3b352ce93d6878"
+    },
+    {
+      "path": "apps/server/src/runtime/codex.ts",
+      "bytes": 31571,
+      "sha256": "97da817c386dbc163676c51356d58dcdac2448f2ea9a91a0e20cba445825ff1b"
+    },
+    {
+      "path": "apps/server/src/runtime/remote-protocol.ts",
+      "bytes": 3172,
+      "sha256": "918fba0ff2207b1114c445130408dc8f52c7e1e6ce34595bef1408d91f2babbd"
+    },
+    {
+      "path": "apps/server/src/runtime/remote.ts",
+      "bytes": 6979,
+      "sha256": "15b7112c9b6de692a435b5fce591fb66b58673afd82a60dff344e26da98194b8"
+    },
+    {
+      "path": "apps/server/src/runtime/types.ts",
+      "bytes": 1495,
+      "sha256": "3c2df5b57a0e7a2ad52154b68b9861896ea27d2fe488a6909660e4b406abdfa5"
+    },
+    {
+      "path": "apps/server/src/runtime/unavailable.ts",
+      "bytes": 644,
+      "sha256": "235e1943e35450f2c27f8cf0570d69d82fee57e9f27be09594273c1a4ea9c796"
+    },
+    {
+      "path": "apps/server/src/store.ts",
+      "bytes": 10861,
+      "sha256": "fed5c793ddb14846a84b9c607178ed0fa11159b2d98d3d7d967f90f1115e7f8a"
+    },
+    {
+      "path": "apps/server/src/tools/knowledge.ts",
+      "bytes": 4292,
+      "sha256": "7d300346cfd58729b06a245b1eaeba28f4d56a6bbc708645ad792533da2f811b"
+    },
+    {
+      "path": "apps/server/src/tools/registry.ts",
+      "bytes": 4416,
+      "sha256": "f5f5b453994c13c0c769f5b61377b0956c66ccc9a753dabe0b14b02240222aa8"
+    },
+    {
+      "path": "apps/server/src/worker.ts",
+      "bytes": 3511,
+      "sha256": "eb067cae962e75a95771469069e65010c9903af760b5fc3768f51607cc9d8588"
+    },
+    {
+      "path": "apps/server/test/api.test.ts",
+      "bytes": 25021,
+      "sha256": "71847768836c67c22439a5b192ec89e4bab1218b99c3918d025500ca13efdcea"
+    },
+    {
+      "path": "apps/server/test/body-limit.test.ts",
+      "bytes": 974,
+      "sha256": "6716a7da228621debeb8ed8b72004f57e97f05cc065317477165351c561fce4c"
+    },
+    {
+      "path": "apps/server/test/codex-knowledge.test.ts",
+      "bytes": 16268,
+      "sha256": "b8910d97d261f45eca7a7c5b2692ac4fe2cff1256491da04bc0dd948582aa277"
+    },
+    {
+      "path": "apps/server/test/codex-plan.test.ts",
+      "bytes": 11378,
+      "sha256": "8962ab9174246304bc740bc21687015e30cfd285f429a4c59dd46062a7accdad"
+    },
+    {
+      "path": "apps/server/test/codex.test.ts",
+      "bytes": 13879,
+      "sha256": "80b28395388cf6bc7a268d5cb30217bf1911b8c68a2dcc920ae152ec7c5375ab"
+    },
+    {
+      "path": "apps/server/test/helpers/codex-harness.ts",
+      "bytes": 3003,
+      "sha256": "fc2ec4e7999d83006a14cb89ccd6498877817d993b22272bd4d595d6345123a7"
+    },
+    {
+      "path": "apps/server/test/helpers/profile-store-child.ts",
+      "bytes": 535,
+      "sha256": "cc59aecbc9d38a6b8b25bd45e6b15dc691a65cc24c25341915dfe01a0d7ffa17"
+    },
+    {
+      "path": "apps/server/test/knowledge-api.test.ts",
+      "bytes": 14371,
+      "sha256": "41d96533012c49a26887ec50a94541eaa20244f362ca5c9687b3c8a044c16d77"
+    },
+    {
+      "path": "apps/server/test/knowledge-tools.test.ts",
+      "bytes": 7354,
+      "sha256": "9ff16a5694849665e333b9a6fef4ef37a086ad8bcd0aa342d8fbbb663b8244cd"
+    },
+    {
+      "path": "apps/server/test/knowledge.test.ts",
+      "bytes": 12455,
+      "sha256": "649a1473ca050416edef404dfa9112e4b3a9cf74c4382604cd06f9b3c2ad90cd"
+    },
+    {
+      "path": "apps/server/test/plan-auth.test.ts",
+      "bytes": 12568,
+      "sha256": "5bff455f04cc210c81f4131a92f70332e71c69ffe10e430b8144a2c8afc159c1"
+    },
+    {
+      "path": "apps/server/test/plan-loopback.test.ts",
+      "bytes": 3578,
+      "sha256": "8e67933ce851c6f1563a99bc76d05005509a042acb270815d4c0fe3ea60ac8b7"
+    },
+    {
+      "path": "apps/server/test/profile-store.test.ts",
+      "bytes": 8988,
+      "sha256": "30c99f4562f800a3b8586e8a086775b8f8cdc9aff0d9f7ed8e059936b5feeba2"
+    },
+    {
+      "path": "apps/server/test/profile-transfer.test.ts",
+      "bytes": 3437,
+      "sha256": "42c15d0c51ec4a1af7f829e985955ee2819eeefe3136496881ca45e5c79c88f0"
+    },
+    {
+      "path": "apps/server/test/remote.test.ts",
+      "bytes": 4369,
+      "sha256": "5fa164abf503aad577bdf68011222e6f2751d2758d4e891af6b0613ef353d0a0"
+    },
+    {
+      "path": "apps/server/test/runner.test.ts",
+      "bytes": 11487,
+      "sha256": "2956589b229defd921b5bff6896bb1a248e6c8369de44fab1538ccbc2e108354"
+    },
+    {
+      "path": "apps/server/test/runtime-config.test.ts",
+      "bytes": 740,
+      "sha256": "9107c7d23f47cea43e1c3a0c426b794d3140821a5418ed5cca672c21bbd60675"
+    },
+    {
+      "path": "apps/server/test/store.test.ts",
+      "bytes": 16305,
+      "sha256": "9533b3582be6f6bbc58dbaa0fe80e79a924f7b003948ba48ee3dddda70e49bf1"
+    },
+    {
+      "path": "apps/server/test/worker.test.ts",
+      "bytes": 4588,
+      "sha256": "321c62919b56e1c6293d7372b7b1684b11222b46905a4e3b37f0e2161b1ada0a"
+    },
+    {
+      "path": "apps/server/tsconfig.json",
+      "bytes": 287,
+      "sha256": "a980a1f4dc47f0196849f51b396a5b08ca63b631fe2042b87a1e9174b7dca7ae"
+    },
+    {
+      "path": "deploy/.gitignore",
+      "bytes": 34,
+      "sha256": "10092c28075d1bb246de035382bb11ccb11f6775ee977f7625acda99b0b1e44d"
+    },
+    {
+      "path": "deploy/Caddy.Dockerfile",
+      "bytes": 447,
+      "sha256": "6f35aa5490ae47e62dfe111ba3157db7dc151a67e623f9c53baa22f42fbb62f4"
+    },
+    {
+      "path": "deploy/Caddy.Dockerfile.dockerignore",
+      "bytes": 52,
+      "sha256": "fc1c4bb655617d65fc39904ca36210e5ae4a6f239852399dc41b10d3c0ae0bd9"
+    },
+    {
+      "path": "deploy/Caddyfile",
+      "bytes": 444,
+      "sha256": "8db65d88dac8245d47d5f618edb6d092d89c977a585ba4148e6ab1520f6f9623"
+    },
+    {
+      "path": "deploy/Caddyfile.ip",
+      "bytes": 702,
+      "sha256": "1aac69df130adb983e222fdb36e5d5d14d5574ef9594af2f1702da11ad4625ad"
+    },
+    {
+      "path": "deploy/Dockerfile",
+      "bytes": 3119,
+      "sha256": "f782605bd3184a6c32115c483d179d1573a4359bf42bfc785ec4bd6426f4603a"
+    },
+    {
+      "path": "deploy/Dockerfile.dockerignore",
+      "bytes": 395,
+      "sha256": "aeed5aefafbf39460050639ab95af902e245e41e3dc6498bec446255305c586f"
+    },
+    {
+      "path": "deploy/check-tls.mjs",
+      "bytes": 3339,
+      "sha256": "2990ee4ec001f90f515bc26db5bf14e399be35fc2f88a53452e570f6a8831775"
+    },
+    {
+      "path": "deploy/compose.plan.yaml",
+      "bytes": 2050,
+      "sha256": "94476a3dfcedb16b2684bd6f5cdb06525314ea6080538566d27bfde6c8075d60"
+    },
+    {
+      "path": "deploy/compose.yaml",
+      "bytes": 2355,
+      "sha256": "944b331352413080cf36431b8a6120ca00d8fe65d47bdd483e1f085a729d3d74"
+    },
+    {
+      "path": "deploy/deployment.env.example",
+      "bytes": 643,
+      "sha256": "8ceac500264eca329b44cf7320139e691c3ea25790a72cff046855f17d5aacf0"
+    },
+    {
+      "path": "deploy/entrypoint.mjs",
+      "bytes": 1035,
+      "sha256": "932f1df7928ea39f98515883d9b99c700e5dae8988ec2e63006fb156be1b3e9d"
+    },
+    {
+      "path": "deploy/https-ip.md",
+      "bytes": 3624,
+      "sha256": "df381b9730f2edbae597f5de23e9c9f08f254d3389faf7db6bdb69b40ff4df7d"
+    },
+    {
+      "path": "deploy/package-release.mjs",
+      "bytes": 15116,
+      "sha256": "f46453b2c6a9ac2bec98692232900f6a869c178d267ab490b888c7d018c6d11c"
+    },
+    {
+      "path": "deploy/preflight.mjs",
+      "bytes": 4880,
+      "sha256": "39ed772d418e412530ef2dd399b91da119dfc105ac40a1a162b9863ddb895ff0"
+    },
+    {
+      "path": "deploy/prepare.mjs",
+      "bytes": 1346,
+      "sha256": "5c986320a27a186d1f729a1ca4406f9789c80522710a2324ff998758f2bad7ae"
+    },
+    {
+      "path": "deploy/read-secret.mjs",
+      "bytes": 1063,
+      "sha256": "e5d93b5ea3270eda90a7062ebe0ecb71a95171f21d7908ef9db745ca0961e03b"
+    },
+    {
+      "path": "deploy/release-content/Dockerfile",
+      "bytes": 3119,
+      "sha256": "f782605bd3184a6c32115c483d179d1573a4359bf42bfc785ec4bd6426f4603a"
+    },
+    {
+      "path": "deploy/release-content/Dockerfile.dockerignore",
+      "bytes": 395,
+      "sha256": "aeed5aefafbf39460050639ab95af902e245e41e3dc6498bec446255305c586f"
+    },
+    {
+      "path": "deploy/release-content/LICENSE",
+      "bytes": 1103,
+      "sha256": "f7609cddd9f331d3056618326e1e6f98a7157e2ddb7c73c0432367cd13a780f2"
+    },
+    {
+      "path": "deploy/release-content/README.md",
+      "bytes": 6111,
+      "sha256": "ebbba4971e165b5e9ac205090c1319d5aaa70a78352422e0bfc1a2fe39343479"
+    },
+    {
+      "path": "deploy/release-content/ci.yml",
+      "bytes": 516,
+      "sha256": "347336986f7bc4ca74758c04e10b4a726922e5bd583166ba839ab478cf7f25f8"
+    },
+    {
+      "path": "deploy/release-content/package-lock.json",
+      "bytes": 42730,
+      "sha256": "bbf2c24ac221b40c62a751b1f2fc21962e10bba2d8d69483b7cc0f40dae95293"
+    },
+    {
+      "path": "deploy/release-content/package.json",
+      "bytes": 987,
+      "sha256": "d53e8ac1ad2c38256a664646a6ec0dfde555ab538bf24c746ebbe9e60e6bcd80"
+    },
+    {
+      "path": "deploy/release-files.json",
+      "bytes": 4236,
+      "sha256": "ad2dcc85bf909448aecc072654544e1cab2973212a0b45a197d2c1b857e93c55"
+    },
+    {
+      "path": "deploy/test/caddy-config.test.mjs",
+      "bytes": 3953,
+      "sha256": "fb551757a541e879f41d3faaaac13776a17d9edd5116aee1f341c6a6744b9f26"
+    },
+    {
+      "path": "deploy/test/package-release.test.mjs",
+      "bytes": 20970,
+      "sha256": "7926f01c738961ea22a5f8101e0d8142a7978769cb1b06960a5274bc3dc2d525"
+    },
+    {
+      "path": "deploy/test/read-secret.test.mjs",
+      "bytes": 1501,
+      "sha256": "9e044f039fc697e4f4f0b6ce751e5f8f4865f8bbf96cacbf7c577b5e18a77f43"
+    },
+    {
+      "path": "deploy/test/tls-config.test.mjs",
+      "bytes": 3697,
+      "sha256": "9aef9109a40af8ca32d395b0ecbaea99f5c3549a941b18c73796e570bdaabc14"
+    },
+    {
+      "path": "deploy/tls-config.mjs",
+      "bytes": 2639,
+      "sha256": "b560f22c88172f3cc19ee4693931f21136d43e97f7e8e3bb70b479a6b4759de6"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 42730,
+      "sha256": "bbf2c24ac221b40c62a751b1f2fc21962e10bba2d8d69483b7cc0f40dae95293"
+    },
+    {
+      "path": "package.json",
+      "bytes": 987,
+      "sha256": "d53e8ac1ad2c38256a664646a6ec0dfde555ab538bf24c746ebbe9e60e6bcd80"
+    },
+    {
+      "path": "packages/contracts/package.json",
+      "bytes": 378,
+      "sha256": "9621f47f910d1041e381f442085033fbf0c328d9c1783664caec5ee338080a07"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "bytes": 2340,
+      "sha256": "58d3bcb9cd94df6f41a1728ea681c92705509349e4555ae286c57b0dc9cad48b"
+    },
+    {
+      "path": "packages/contracts/tsconfig.json",
+      "bytes": 274,
+      "sha256": "63d9f8fabb0e50a41e6478384c7837479a901f45b9df67c68af0dd8fc63ecf37"
+    },
+    {
+      "path": "scripts/server.mjs",
+      "bytes": 848,
+      "sha256": "59e2e8e589284164dcc86cf963e7fcc60671758546703551607902364a104ef4"
+    },
+    {
+      "path": "scripts/setup.mjs",
+      "bytes": 962,
+      "sha256": "2b044798555ba7e53b75208eedfebf82e0c7153fbcff641fac62f83a561908fd"
+    }
+  ]
+}

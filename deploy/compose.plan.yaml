@@ -1,0 +1,68 @@
+# Opt in explicitly with -f deploy/compose.yaml -f deploy/compose.plan.yaml.
+# This does not log in, publish code or grant any device/tool capability.
+services:
+  server:
+    environment:
+      AGENT_RUNTIME: remote
+      AGENT_RUNNER_URL: http://runner:8788
+      AGENT_RUNNER_AUTH_TOKEN_FILE: /run/secrets/runner_auth_token
+    secrets: [agent_auth_token, runner_auth_token]
+    networks: [backend, execution]
+    depends_on:
+      runner:
+        condition: service_healthy
+
+  runner:
+    image: personal-agent-runner:${RELEASE_TAG:-local}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: runner
+      args:
+        NODE_IMAGE: ${NODE_IMAGE:-node:24-bookworm-slim}
+        CODEX_VERSION: ${AGENT_CODEX_VERSION:-0.154.0}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 1g
+    stop_grace_period: 30s
+    environment:
+      NODE_ENV: production
+      RUNNER_HOST: 0.0.0.0
+      RUNNER_PORT: "8788"
+      AGENT_RUNNER_AUTH_TOKEN_FILE: /run/secrets/runner_auth_token
+      AGENT_CHATGPT_PROFILE_DIR: /state/profile
+      AGENT_RUNNER_WORKSPACE: /workspace
+      AGENT_CODEX_COMMAND: /usr/local/bin/codex
+      AGENT_CODEX_MODEL: ${AGENT_CODEX_MODEL:-}
+      AGENT_CHATGPT_APP_NAME: ${AGENT_CHATGPT_APP_NAME:-personal_agent}
+      AGENT_APP_TITLE: ${AGENT_APP_TITLE:-Zhongyan}
+    secrets: [runner_auth_token]
+    volumes:
+      - runner_state:/state
+      - runner_workspace:/workspace
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=128m
+    # Only this process has model-provider egress; API databases are not mounted.
+    networks: [execution, model_egress]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  execution:
+    internal: true
+  model_egress: {}
+
+volumes:
+  runner_state: {}
+  runner_workspace: {}
+
+secrets:
+  runner_auth_token:
+    file: ./.secrets/runner-auth-token

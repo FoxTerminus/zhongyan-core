@@ -1,0 +1,90 @@
+name: personal-agent
+
+services:
+  server:
+    image: personal-agent-server:${RELEASE_TAG:-local}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: server
+      args:
+        NODE_IMAGE: ${NODE_IMAGE:-node:24-bookworm-slim}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 512m
+    stop_grace_period: 30s
+    environment:
+      NODE_ENV: production
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: "8787"
+      AGENT_DATA_DIR: /data
+      # This deployment is deliberately offline until cloud auth/tool integration.
+      AGENT_RUNTIME: disabled
+      AGENT_AUTH_TOKEN_FILE: /run/secrets/agent_auth_token
+      AGENT_ALLOWED_ORIGINS: ${AGENT_ALLOWED_ORIGINS:-}
+    secrets: [agent_auth_token]
+    volumes:
+      - agent_data:/data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    networks: [backend]
+    # No ports: the service is reachable only through the reverse proxy.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  proxy:
+    image: personal-agent-proxy:${RELEASE_TAG:-local}
+    build:
+      context: ..
+      dockerfile: deploy/Caddy.Dockerfile
+      args:
+        CADDY_IMAGE: ${CADDY_IMAGE:-caddy:2.11.7-alpine}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 256m
+    environment:
+      AGENT_DOMAIN: ${AGENT_DOMAIN:?Set the public hostname or IPv4 in deploy/deployment.env}
+    command: [caddy, run, --config, '/etc/caddy/Caddyfile.${AGENT_TLS_MODE:-domain}', --adapter, caddyfile]
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "80:8080"
+      - "443:8443"
+      - "443:8443/udp"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    networks: [edge, backend]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  edge: {}
+  backend:
+    internal: true
+
+volumes:
+  agent_data: {}
+  caddy_data: {}
+  caddy_config: {}
+
+secrets:
+  agent_auth_token:
+    file: ./.secrets/agent-auth-token

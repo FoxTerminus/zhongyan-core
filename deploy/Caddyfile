@@ -1,0 +1,22 @@
+{
+	http_port 8080
+	https_port 8443
+	admin off
+	# Public ports are 80/443; do not redirect users to container port 8443.
+	auto_https disable_redirects
+}
+
+http://{$AGENT_DOMAIN} {
+	redir https://{$AGENT_DOMAIN}{uri} permanent
+}
+
+https://{$AGENT_DOMAIN} {
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+	}
+	# Do not buffer live agent events. No automatic retries for mutating requests.
+	reverse_proxy server:8787 {
+		flush_interval -1
+	}
+}
