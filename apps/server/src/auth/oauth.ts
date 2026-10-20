@@ -2,7 +2,7 @@ import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypt
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from 'jose';
 import { z } from 'zod';
 import type { PlanProfile } from './profile-store.js';
-import { OPENAI_OIDC, PLAN_APP, PLAN_SCOPE, PLAN_SCOPES, PlanAuthError } from './types.js';
+import { OPENAI_OIDC, PLAN_APP, PLAN_SCOPE, PLAN_SCOPES, PlanAuthError, isPlanHostId } from './types.js';
 
 const tokenText = z.string().min(1).max(24_000).refine(value => !/[\r\n\0]/.test(value));
 const Tokens = z.object({
@@ -77,6 +77,11 @@ export class PlanSignInAttempt {
     readonly previous: PlanProfile | null,
     now: number,
   ) {
+    if (!isPlanHostId(hostId)
+        || (previous && (!isPlanHostId(previous.hostId) || previous.hostId.toLowerCase() !== hostId.toLowerCase()))) {
+      throw new PlanAuthError('invalid_response', '本应用主机标识必须是有效的 UUIDv4 URN，且与已保存的授权一致。');
+    }
+    this.hostId = hostId.toLowerCase();
     const uri = new URL(redirectUri);
     if (uri.protocol !== 'http:' || uri.hostname !== '127.0.0.1' || !uri.port
         || uri.pathname !== '/auth/callback' || uri.search || uri.hash || uri.username || uri.password) {
@@ -87,7 +92,7 @@ export class PlanSignInAttempt {
     url.search = new URLSearchParams({
       client_id: previous?.clientId ?? 'dynamic_agent_client',
       ...(!previous ? { agent_name_hint: oauth.appName } : {}),
-      ext_agent_host_id: hostId, response_type: 'code', redirect_uri: redirectUri,
+      ext_agent_host_id: this.hostId, response_type: 'code', redirect_uri: redirectUri,
       scope: PLAN_SCOPES.join(' '), resource: OPENAI_OIDC.resource,
       state: this.state, nonce: this.nonce, code_challenge_method: 'S256',
       code_challenge: createHash('sha256').update(this.verifier).digest('base64url'),
@@ -126,7 +131,7 @@ export class PlanSignInAttempt {
     const identity = await this.oauth.verify(tokens.id_token, { clientId, nonce: this.nonce, subject: this.previous?.subject, now });
     signal?.throwIfAborted();
     return {
-      version: 1, revision: randomUUID(), hostId: this.hostId, clientId, appName: this.previous?.appName ?? this.oauth.appName,
+      version: 2, revision: randomUUID(), hostId: this.hostId, clientId, appName: this.previous?.appName ?? this.oauth.appName,
       issuer: OPENAI_OIDC.issuer, subject: identity.subject,
       idToken: tokens.id_token, accessToken: tokens.access_token, refreshToken: tokens.refresh_token,
       scopes: requiredScopes(tokens.scope.split(/\s+/).filter(Boolean)),

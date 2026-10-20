@@ -7,17 +7,21 @@ import { dirname, join, parse, resolve, sep } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { promisify } from 'node:util';
 import { z } from 'zod';
+import { isPlanHostId } from './types.js';
 
 const execute = promisify(execFile);
 const MAX_BYTES = 64 * 1024;
 const LOCK_WAIT_MS = 1_500;
 const identifier = z.string().min(1).max(512).regex(/^\S+$/);
 const token = z.string().min(1).max(32_768).regex(/^\S+$/);
+const hostIdSchema = z.string().refine(isPlanHostId).transform(value => value.toLowerCase());
+const legacyHostIdSchema = z.string().refine(value => isPlanHostId(`urn:uuid:${value}`))
+  .transform(value => `urn:uuid:${value.toLowerCase()}`);
 const profileSchema = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
   revision: identifier,
   appName: z.string().min(1).max(64).regex(/^[A-Za-z][A-Za-z0-9_-]{0,63}$/),
-  hostId: z.uuid(),
+  hostId: hostIdSchema,
   clientId: identifier.refine(value => value !== 'dynamic_agent_client'),
   issuer: z.literal('https://auth.openai.com'),
   subject: identifier,
@@ -29,12 +33,17 @@ const profileSchema = z.object({
   expiresAt: z.number().int().positive().safe(),
   savedAt: z.number().int().positive().safe(),
 }).strict();
-const hostSchema = z.object({ version: z.literal(1), hostId: z.uuid() }).strict();
+const legacyProfileSchema = profileSchema.extend({ version: z.literal(1), hostId: legacyHostIdSchema })
+  .transform(value => ({ ...value, version: 2 as const }));
+const readableProfileSchema = z.union([profileSchema, legacyProfileSchema]);
+const hostSchema = z.object({ version: z.literal(2), hostId: hostIdSchema }).strict();
+const legacyHostSchema = hostSchema.extend({ version: z.literal(1), hostId: legacyHostIdSchema })
+  .transform(value => ({ ...value, version: 2 as const }));
 
 export type PlanProfile = z.infer<typeof profileSchema>;
 /** Validates only this application's profile format, never Codex desktop auth. */
 export function parsePlanProfile(value: unknown): PlanProfile {
-  const parsed = profileSchema.safeParse(value);
+  const parsed = readableProfileSchema.safeParse(value);
   if (!parsed.success) throw new ProfileStoreError('迁移文件不是有效的本应用授权配置。');
   return parsed.data;
 }
@@ -170,7 +179,8 @@ export class FilePlanProfileStore {
       if (!(await directories(this.directory, false))) return null;
       const value = await this.readJson('profile.json');
       if (value === null) return null;
-      const result = profileSchema.safeParse(value);
+      // Status reads may normalize legacy metadata in memory but must never write or refresh.
+      const result = readableProfileSchema.safeParse(value);
       if (!result.success) throw new ProfileStoreError('独立登录配置格式无效，需要重新授权。');
       return result.data;
     } catch (error) { throw safe(error); }
@@ -231,10 +241,14 @@ export class FilePlanProfileStore {
       const existing = await this.readJson('host.json');
       if (existing !== null) {
         const parsed = hostSchema.safeParse(existing);
-        if (!parsed.success) throw new ProfileStoreError('独立登录主机信息格式无效。');
-        return parsed.data.hostId;
+        if (parsed.success) return parsed.data.hostId;
+        const migrated = legacyHostSchema.safeParse(existing);
+        if (!migrated.success) throw new ProfileStoreError('独立登录主机信息格式无效。');
+        // Prefix the existing UUID; retain its identity, and commit under this owned lock.
+        await this.atomicJson('host.json', migrated.data);
+        return migrated.data.hostId;
       }
-      const registration: HostRegistration = { version: 1, hostId: randomUUID() };
+      const registration: HostRegistration = { version: 2, hostId: `urn:uuid:${randomUUID()}` };
       await this.atomicJson('host.json', registration);
       return registration.hostId;
     }).catch(error => { throw safe(error); });

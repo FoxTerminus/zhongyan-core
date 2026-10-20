@@ -9,7 +9,7 @@ import type { PlanProfile } from '../src/auth/profile-store.js';
 
 const now = 1_800_000_000_000;
 const profile = (overrides: Partial<PlanProfile> = {}): PlanProfile => ({
-  version: 1, revision: 'revision-one', appName: 'personal_agent', hostId: 'urn:uuid:test-host', clientId: 'issued-client',
+  version: 2, revision: 'revision-one', appName: 'personal_agent', hostId: 'urn:uuid:11111111-1111-4111-8111-111111111111', clientId: 'issued-client',
   issuer: OPENAI_OIDC.issuer, subject: 'test-subject', accessToken: 'test-access', refreshToken: 'test-refresh',
   idToken: 'test-identity', scopes: [...PLAN_SCOPES], expiresAt: now + 3_600_000, savedAt: now, ...overrides,
 });
@@ -25,7 +25,7 @@ function fixture(overrides: { tokens?: object; verify?: (token: string, expected
     }) as typeof fetch,
     verifyIdentity: overrides.verify ?? (async (_token, expected) => { identities.push(expected); return { subject: 'test-subject' }; }),
   });
-  const attempt = oauth.begin('http://127.0.0.1:34567/auth/callback', 'urn:uuid:test-host', null);
+  const attempt = oauth.begin('http://127.0.0.1:34567/auth/callback', 'urn:uuid:11111111-1111-4111-8111-111111111111', null);
   const auth = new URL(attempt.authorizationUrl);
   const callback = (params: Record<string, string> = {}) => {
     const url = new URL(attempt.redirectUri); url.search = new URLSearchParams({
@@ -40,6 +40,7 @@ test('dynamic registration uses issued client, exact loopback, state/nonce and S
   assert.equal(f.auth.origin + f.auth.pathname, OPENAI_OIDC.authorize);
   assert.equal(f.auth.searchParams.get('client_id'), 'dynamic_agent_client');
   assert.equal(f.auth.searchParams.get('agent_name_hint'), PLAN_APP.name);
+  assert.equal(f.auth.searchParams.get('ext_agent_host_id'), profile().hostId);
   const saved = await f.attempt.complete(f.callback());
   assert.equal(saved.clientId, 'issued-client'); assert.equal(saved.subject, 'test-subject');
   assert.equal(f.calls.length, 1); assert.equal(f.calls[0]!.url, OPENAI_OIDC.token);
@@ -50,6 +51,20 @@ test('dynamic registration uses issued client, exact loopback, state/nonce and S
   assert.equal(createHash('sha256').update(form.get('code_verifier')!).digest('base64url'), f.auth.searchParams.get('code_challenge'));
   assert.deepEqual(f.identities[0], { clientId: 'issued-client', nonce: f.auth.searchParams.get('nonce'), subject: undefined, now });
   await assert.rejects(f.attempt.complete(f.callback()), PlanAuthError); assert.equal(f.calls.length, 1);
+});
+
+test('authorization rejects bare UUIDs, malformed URIs and mismatched saved hosts before any network request', () => {
+  const f = fixture();
+  for (const hostId of [
+    '11111111-1111-4111-8111-111111111111', 'host', 'urn:uuid:test-host',
+    'urn:uuid:11111111-1111-7111-8111-111111111111',
+    'urn:uuid:11111111-1111-4111-7111-111111111111',
+    `${profile().hostId}?query`, `${profile().hostId}\n`,
+    'https://example.com/host',
+  ]) assert.throws(() => f.oauth.begin(f.attempt.redirectUri, hostId, null), PlanAuthError);
+  assert.throws(() => f.oauth.begin(f.attempt.redirectUri,
+    'urn:uuid:22222222-2222-4222-8222-222222222222', profile()), PlanAuthError);
+  assert.equal(f.calls.length, 0);
 });
 
 test('wrong state, OAuth denial, duplicate parameters and unissued client never exchange a code', async () => {
@@ -67,17 +82,17 @@ test('wrong state, OAuth denial, duplicate parameters and unissued client never 
 test('expired transaction and unsafe callback locations are rejected', async () => {
   let clock = now;
   const oauth = new PlanOAuth({ now: () => clock });
-  const attempt = oauth.begin('http://127.0.0.1:10000/auth/callback', 'host', null);
+  const attempt = oauth.begin('http://127.0.0.1:10000/auth/callback', 'urn:uuid:11111111-1111-4111-8111-111111111111', null);
   clock += 600_000;
   const url = new URL(attempt.redirectUri); url.search = new URL(attempt.authorizationUrl).search;
   await assert.rejects(attempt.complete(url.toString()), PlanAuthError);
   for (const redirect of ['https://example.org/auth/callback', 'http://localhost:1234/auth/callback', 'http://127.0.0.1:1234/callback']) {
-    assert.throws(() => oauth.begin(redirect, 'host', null), PlanAuthError);
+    assert.throws(() => oauth.begin(redirect, 'urn:uuid:11111111-1111-4111-8111-111111111111', null), PlanAuthError);
   }
 });
 
 test('returning authorization preserves registration, omits sensitive hints, and rejects a switched client', async () => {
-  const f = fixture(); const attempt = f.oauth.begin(f.attempt.redirectUri, 'host', profile());
+  const f = fixture(); const attempt = f.oauth.begin(f.attempt.redirectUri, 'urn:uuid:11111111-1111-4111-8111-111111111111', profile());
   const auth = new URL(attempt.authorizationUrl);
   assert.equal(auth.searchParams.get('client_id'), 'issued-client');
   assert.equal(auth.searchParams.has('agent_name_hint'), false); assert.equal(auth.searchParams.has('id_token_hint'), false);

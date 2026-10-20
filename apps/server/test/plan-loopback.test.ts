@@ -7,7 +7,7 @@ import type { PlanProfile } from '../src/auth/profile-store.js';
 
 function memoryStore() {
   let locked = false; const writes: PlanProfile[] = [];
-  return { writes, get locked() { return locked; }, hostId: async () => 'urn:uuid:fixture-host', read: async () => null,
+  return { writes, get locked() { return locked; }, hostId: async () => 'urn:uuid:11111111-1111-4111-8111-111111111111', read: async () => null,
     async withLock<T>(callback: () => Promise<T>) { locked = true; try { return await callback(); } finally { locked = false; } },
     async write(profile: PlanProfile) { assert.equal(locked, true); writes.push(profile); },
   };

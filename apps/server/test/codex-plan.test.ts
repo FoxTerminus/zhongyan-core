@@ -120,7 +120,7 @@ test('queued Worker task can renew an expired plan session even when read-only s
   mkdirSync(testRoot, { recursive: true }); const directory = mkdtempSync(join(testRoot, 'worker-'));
   const store = new Store(join(directory, 'state.sqlite'));
   let refreshes = 0;
-  let saved: PlanProfile = { version: 1, revision: randomUUID(), appName: 'personal_agent', hostId: randomUUID(),
+  let saved: PlanProfile = { version: 2, revision: randomUUID(), appName: 'personal_agent', hostId: `urn:uuid:${randomUUID()}`,
     clientId: 'issued-client', issuer: OPENAI_OIDC.issuer, subject: 'subject', accessToken: 'expired-access',
     refreshToken: 'old-refresh', idToken: 'old-id', scopes: [...PLAN_SCOPES], expiresAt: Date.now() - 1, savedAt: Date.now() - 3600_000 };
   const credentials = new StoredPlanCredentialProvider({ read: async () => saved,

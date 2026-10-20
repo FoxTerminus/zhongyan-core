@@ -55,13 +55,13 @@
     },
     {
       "path": "apps/server/src/auth/oauth.ts",
-      "bytes": 11278,
-      "sha256": "9195445479a2f0b98534b3c6a1dc8e4b6499d74eda2323982bc029216ba8c85b"
+      "bytes": 11638,
+      "sha256": "f5bd782833c75cac22a540f035a73b15690f7cf973bb8453474b8f0a8d4927db"
     },
     {
       "path": "apps/server/src/auth/profile-store.ts",
-      "bytes": 14172,
-      "sha256": "d56b519c76fd2a391a07389a6dd14b6d85ff42060c8e92259027035a6846865d"
+      "bytes": 15275,
+      "sha256": "4757726d2aa57912daf5d294299aff32b67c6549d6c25517999f5bcbb2dbe905"
     },
     {
       "path": "apps/server/src/auth/profile-transfer.ts",
@@ -75,8 +75,8 @@
     },
     {
       "path": "apps/server/src/auth/types.ts",
-      "bytes": 1750,
-      "sha256": "2500946cd048c465dd33afe67c39b0f8b3366998287af6e2504bb2d019b36774"
+      "bytes": 2274,
+      "sha256": "d6acd2aaeb00785573694db9104c2b8d800990aa1a1c501c2c8f1ca9ec4f7963"
     },
     {
       "path": "apps/server/src/config.ts",
@@ -190,8 +190,8 @@
     },
     {
       "path": "apps/server/test/codex-plan.test.ts",
-      "bytes": 11378,
-      "sha256": "8962ab9174246304bc740bc21687015e30cfd285f429a4c59dd46062a7accdad"
+      "bytes": 11392,
+      "sha256": "915e83386fe7aed3f271a34c8e9da829d5c85711b4822e7b6006fe3f513efb0f"
     },
     {
       "path": "apps/server/test/codex.test.ts",
@@ -225,23 +225,23 @@
     },
     {
       "path": "apps/server/test/plan-auth.test.ts",
-      "bytes": 12568,
-      "sha256": "5bff455f04cc210c81f4131a92f70332e71c69ffe10e430b8144a2c8afc159c1"
+      "bytes": 13550,
+      "sha256": "baefe17bfe26ac904e4e85ab4bfe44cade108e2c7ed30e09b641845599bfe3a1"
     },
     {
       "path": "apps/server/test/plan-loopback.test.ts",
-      "bytes": 3578,
-      "sha256": "8e67933ce851c6f1563a99bc76d05005509a042acb270815d4c0fe3ea60ac8b7"
+      "bytes": 3602,
+      "sha256": "25adc5784c71ebdec3fd57d2d05a29822fae580e305f8927afce4ba4523cef6d"
     },
     {
       "path": "apps/server/test/profile-store.test.ts",
-      "bytes": 8988,
-      "sha256": "30c99f4562f800a3b8586e8a086775b8f8cdc9aff0d9f7ed8e059936b5feeba2"
+      "bytes": 13615,
+      "sha256": "fd6f22d8c7a102fe48774a92262a1723e15188aa125bce24fb258b729a559f3f"
     },
     {
       "path": "apps/server/test/profile-transfer.test.ts",
-      "bytes": 3437,
-      "sha256": "42c15d0c51ec4a1af7f829e985955ee2819eeefe3136496881ca45e5c79c88f0"
+      "bytes": 4463,
+      "sha256": "f5ece2f5a207e4205de10474e8763da3c943fde027bafe03a528e9db428b5224"
     },
     {
       "path": "apps/server/test/remote.test.ts",

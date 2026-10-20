@@ -8,6 +8,17 @@ export const OPENAI_OIDC = Object.freeze({
   jwks: 'https://auth.openai.com/.well-known/jwks.json',
   resource: 'https://api.openai.com/v1',
 });
+/**
+ * This application uses the UUIDv4 URI alternative supported by SIWC.
+ * Bare UUIDs are accepted only by the version-1 storage migration, never by OAuth.
+ * Other supported SIWC identifier families require an explicit future schema change.
+ */
+export function isPlanHostId(value: unknown): value is string {
+  return typeof value === 'string' && value.length === 45
+    && /^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+    && value.startsWith('urn:uuid:');
+}
+
 export const PLAN_SCOPE = 'chatgpt.tokens.use.direct';
 export const PLAN_SCOPES = ['openid', 'profile', 'email', 'offline_access', 'resource.invoke', PLAN_SCOPE];
 export class PlanAuthError extends Error {
