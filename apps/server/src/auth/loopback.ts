@@ -31,6 +31,10 @@ export async function authorizePlanProfile(store: LoginStore, options: {
           respond(response, 404, 'Not found.'); return;
         }
         if (!attempt || inFlight || settled) { respond(response, 409, 'This sign-in attempt has already been handled.'); return; }
+        // Token exchange, identity verification and durable storage can together
+        // outlast the idle-socket limit. Keep this accepted callback open until
+        // it receives its result; the overall login deadline still bounds it.
+        response.setTimeout(0);
         inFlight = (async () => {
           try {
             const profile = await attempt!.complete(`http://${expectedHost}${request.url}`, controller.signal);

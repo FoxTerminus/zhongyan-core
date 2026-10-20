@@ -49,6 +49,16 @@ npm run dev:server
 
 ChatGPT 套餐接入需要按适用的官方流程完成应用身份、授权及一次真实推理验证；登录成功或发现模型列表不能替代推理验证。采用 MIT 许可也不自动满足服务方对开源应用的全部接入要求。
 
+Windows 浏览器使用系统代理时，可在本机授权命令后加 `--system-proxy`：
+
+```sh
+node apps/server/dist/auth/cli.js login --open-source-ready --system-proxy --profile-dir <独立目录>
+```
+
+工具通过 Windows 解析当前用户系统设置对官方授权地址的代理选择，在独立 Node 子进程中启用环境代理，使令牌交换和身份公钥下载使用相同配置；回环回调仍直连。不会修改系统代理、记录代理原值或关闭 TLS 校验。需要运行时支持 `--use-env-proxy`，不要求某个固定 Node 小版本；无法解析 HTTP(S) 代理或连接失败时明确报错，不自动回退直连。该选项只影响本次登录，后续运行器与云端网络须分别配置和验证。
+
+模型子进程会保留显式配置的 `HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY` 与 `NO_PROXY`（包括对应小写名称），其他业务凭据与 API key 仍不继承。Windows 授权子进程通过 IPC 正常取消并清理登录锁。已接受的回调等待令牌交换和身份校验完成，避免普通连接的空闲超时打断成功页面；整体登录期限仍然生效。
+
 账号、工作区及实际使用地区还须满足服务方的支持条件；选择服务器地区不能单独证明资格。授权端点的地区或权限拒绝应明确呈现，停止重复登录，按官方说明处理；错误正文与凭据不会写入诊断。
 
 - [Sign in with ChatGPT quickstart](https://developers.openai.com/siwc/quickstart)

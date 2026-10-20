@@ -85,12 +85,13 @@ export function resolveCodexCommand(command = 'codex'): string {
   throw new RuntimeUnavailableError('找不到 Codex 原生程序，请安装 Codex CLI 或设置 AGENT_CODEX_COMMAND。');
 }
 
-/** Only OS/runtime discovery and Codex-owned login locations cross this boundary. */
+/** Only OS/runtime discovery, network routing and Codex-owned login locations cross this boundary. */
 export function buildCodexEnvironment(environment: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const allowed = new Set([
     'PATH', 'PATHEXT', 'SYSTEMROOT', 'WINDIR', 'COMSPEC', 'HOME', 'USERPROFILE',
     'APPDATA', 'LOCALAPPDATA', 'TEMP', 'TMP', 'TMPDIR', 'LANG', 'LC_ALL',
     'CODEX_HOME', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'XDG_STATE_HOME',
+    'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY',
   ]);
   return Object.fromEntries(Object.entries(environment).filter(([name]) => allowed.has(name.toUpperCase())));
 }

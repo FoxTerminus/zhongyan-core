@@ -22,6 +22,18 @@ test('model subprocess receives no service or business credentials', () => {
   }), { PATH: '/bin', SYSTEMROOT: 'system', CODEX_HOME: '/isolated/codex' });
 });
 
+test('model subprocess retains explicit proxy routing without enabling unrelated credentials or Node hooks', () => {
+  assert.deepEqual(buildCodexEnvironment({
+    HTTPS_PROXY: 'http://127.0.0.1:10001', http_proxy: 'http://127.0.0.1:10001',
+    ALL_PROXY: 'http://127.0.0.1:10001', no_proxy: '127.0.0.1,localhost',
+    NODE_OPTIONS: '--require=unrelated-hook', NODE_USE_ENV_PROXY: '1',
+    OPENAI_API_KEY: 'not-a-plan-token', AGENT_AUTH_TOKEN: 'private',
+  }), {
+    HTTPS_PROXY: 'http://127.0.0.1:10001', http_proxy: 'http://127.0.0.1:10001',
+    ALL_PROXY: 'http://127.0.0.1:10001', no_proxy: '127.0.0.1,localhost',
+  });
+});
+
 test('status uses read-only discovery, filters account details and discovers model dynamically', async t => {
   const h = harness();
   t.after(() => h.runtime.close());

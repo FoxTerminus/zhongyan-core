@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { setTimeout as delay } from 'node:timers/promises';
 import { authorizePlanProfile } from '../src/auth/loopback.js';
 import { PlanOAuth } from '../src/auth/oauth.js';
 import { PLAN_SCOPES, PlanAuthError } from '../src/auth/types.js';
@@ -28,6 +29,35 @@ test('administrator loopback listens before publishing URL, validates callback a
     callbackRequest = fetch(callback);
   } }, oauth());
   assert.equal((await callbackRequest)!.status, 200); assert.equal(store.writes.length, 1); assert.equal(store.locked, false);
+});
+
+test('accepted callback delivers success when exchange and identity checks exceed the idle socket timeout', {
+  timeout: 20_000,
+}, async () => {
+  const store = memoryStore();
+  const slowOAuth = new PlanOAuth({
+    // Each upstream operation remains within its own production timeout, while
+    // their combined duration exceeds the incoming connection's 10-second limit.
+    fetch: (async () => {
+      await delay(6000);
+      return new Response(JSON.stringify({ token_type: 'Bearer', access_token: 'test-access', refresh_token: 'test-refresh',
+        id_token: 'test-id', scope: PLAN_SCOPES.join(' '), expires_in: 3600 }));
+    }) as typeof fetch,
+    verifyIdentity: async () => { await delay(5000); return { subject: 'test-subject' }; },
+  });
+  let callbackRequest: Promise<Response> | undefined;
+  await authorizePlanProfile(store, { onReady(url) {
+    const auth = new URL(url); const callback = new URL(auth.searchParams.get('redirect_uri')!);
+    callback.search = new URLSearchParams({ code: 'offline-test', state: auth.searchParams.get('state')!, client_id: 'issued-client' }).toString();
+    callbackRequest = fetch(callback, { signal: AbortSignal.timeout(17_000) });
+    // Observe an early socket failure without triggering an unhandled rejection.
+    void callbackRequest.catch(() => {});
+  } }, slowOAuth);
+  const response = await callbackRequest!;
+  assert.equal(response.status, 200);
+  assert.match(await response.text(), /authorization saved/);
+  assert.equal(store.writes.length, 1);
+  assert.equal(store.locked, false);
 });
 
 test('administrator cancellation closes pending loopback without token exchange or writes', async () => {

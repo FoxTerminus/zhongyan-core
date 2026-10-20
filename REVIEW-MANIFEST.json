@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6976,
-      "sha256": "99377499ecb8034e0e1c54c05a495b12ba28f964f0606735d167b4076b336de1"
+      "bytes": 8129,
+      "sha256": "aef358929ec61388440a7eaaef4d5724e1d489097697099200e5a817a5beb2fc"
     },
     {
       "path": "apps/server/package.json",
@@ -45,13 +45,13 @@
     },
     {
       "path": "apps/server/src/auth/cli.ts",
-      "bytes": 3970,
-      "sha256": "406c593a1ba3b2ec79cb5f926509f015f1d30cad07b0db46377473bca866e6ff"
+      "bytes": 6307,
+      "sha256": "3ee1f2bb66718fc7d861a21676b69faba269ca67e3251af7113fe30a15cbdaa3"
     },
     {
       "path": "apps/server/src/auth/loopback.ts",
-      "bytes": 4482,
-      "sha256": "ff1122b34efcafe858cee0f99edb4749d46fc67e73e8c8420a1a5f012993bb91"
+      "bytes": 4756,
+      "sha256": "26455a133269dafa13dea4f977b571bfc6cadb20368c9a59849f6ccc5e26c754"
     },
     {
       "path": "apps/server/src/auth/oauth.ts",
@@ -72,6 +72,11 @@
       "path": "apps/server/src/auth/provider.ts",
       "bytes": 3542,
       "sha256": "11545fac3bb7f1dea11ce60d67fdd0e976fc179d6225bb51cbd7c261a9e33571"
+    },
+    {
+      "path": "apps/server/src/auth/system-proxy.ts",
+      "bytes": 4556,
+      "sha256": "1185e2e0860b94597e6e3edee9f0e8400c75196b4403743a4a403aa63f027c97"
     },
     {
       "path": "apps/server/src/auth/types.ts",
@@ -130,8 +135,8 @@
     },
     {
       "path": "apps/server/src/runtime/codex.ts",
-      "bytes": 31571,
-      "sha256": "97da817c386dbc163676c51356d58dcdac2448f2ea9a91a0e20cba445825ff1b"
+      "bytes": 31647,
+      "sha256": "48e9b9a78e85d781d8e5876f6740e008f684056e7fcf504cd587c510491a6ce5"
     },
     {
       "path": "apps/server/src/runtime/remote-protocol.ts",
@@ -195,8 +200,8 @@
     },
     {
       "path": "apps/server/test/codex.test.ts",
-      "bytes": 13879,
-      "sha256": "80b28395388cf6bc7a268d5cb30217bf1911b8c68a2dcc920ae152ec7c5375ab"
+      "bytes": 14509,
+      "sha256": "85fb1d6792acd7954bdb4be7559206382d564d99ee4e308bbd12221b5a0c24dc"
     },
     {
       "path": "apps/server/test/helpers/codex-harness.ts",
@@ -229,9 +234,14 @@
       "sha256": "ccdfb0c5e21fe0897222e25badb9bf446d74619ad9af5086dc481734f1ee9c7d"
     },
     {
+      "path": "apps/server/test/plan-cli.test.ts",
+      "bytes": 5042,
+      "sha256": "80e272fff53904439c192edf46915426aee88c46391725c0e0ac81a248caf31a"
+    },
+    {
       "path": "apps/server/test/plan-loopback.test.ts",
-      "bytes": 4906,
-      "sha256": "cbe0774c8197c7cf0e2366af6debdcff23b0ed5cfec0e47f574bd01e4c9190b8"
+      "bytes": 6520,
+      "sha256": "ed5f8510bfe921a94b435c801af8812223a6bcfc3dbf6ae84d32b261aeff9aea"
     },
     {
       "path": "apps/server/test/profile-store.test.ts",
@@ -262,6 +272,11 @@
       "path": "apps/server/test/store.test.ts",
       "bytes": 16305,
       "sha256": "9533b3582be6f6bbc58dbaa0fe80e79a924f7b003948ba48ee3dddda70e49bf1"
+    },
+    {
+      "path": "apps/server/test/system-proxy.test.ts",
+      "bytes": 6133,
+      "sha256": "ddf9909a9a8df307843e7a8e318617f618ab44ab3e5ade8c6ff583478326ff07"
     },
     {
       "path": "apps/server/test/worker.test.ts",
@@ -375,8 +390,8 @@
     },
     {
       "path": "deploy/release-content/README.md",
-      "bytes": 6976,
-      "sha256": "99377499ecb8034e0e1c54c05a495b12ba28f964f0606735d167b4076b336de1"
+      "bytes": 8129,
+      "sha256": "aef358929ec61388440a7eaaef4d5724e1d489097697099200e5a817a5beb2fc"
     },
     {
       "path": "deploy/release-content/ci.yml",
@@ -395,8 +410,8 @@
     },
     {
       "path": "deploy/release-files.json",
-      "bytes": 4236,
-      "sha256": "ad2dcc85bf909448aecc072654544e1cab2973212a0b45a197d2c1b857e93c55"
+      "bytes": 4369,
+      "sha256": "20ff44d682798b63c173a349e4bf048db64a0138bba8898fc1c811f1beb67f1c"
     },
     {
       "path": "deploy/test/caddy-config.test.mjs",
