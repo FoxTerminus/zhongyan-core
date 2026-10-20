@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 8129,
-      "sha256": "aef358929ec61388440a7eaaef4d5724e1d489097697099200e5a817a5beb2fc"
+      "bytes": 8461,
+      "sha256": "1087b31851f4e89a46e5292e6b68f32c51971a5fa55693e4bd42293457dad601"
     },
     {
       "path": "apps/server/package.json",
@@ -324,6 +324,16 @@
       "sha256": "aeed5aefafbf39460050639ab95af902e245e41e3dc6498bec446255305c586f"
     },
     {
+      "path": "deploy/backup.mjs",
+      "bytes": 7152,
+      "sha256": "7ca043abe4f9d4cd7b30bd7bb11bf68a41c703aa0e565e7846e590b468103024"
+    },
+    {
+      "path": "deploy/check-health.mjs",
+      "bytes": 4490,
+      "sha256": "f724eac9df7aff5df09194b1b0b7fb0d83518471ca0e987a9547e8ed9c7deec9"
+    },
+    {
       "path": "deploy/check-tls.mjs",
       "bytes": 3339,
       "sha256": "2990ee4ec001f90f515bc26db5bf14e399be35fc2f88a53452e570f6a8831775"
@@ -352,6 +362,16 @@
       "path": "deploy/https-ip.md",
       "bytes": 3624,
       "sha256": "df381b9730f2edbae597f5de23e9c9f08f254d3389faf7db6bdb69b40ff4df7d"
+    },
+    {
+      "path": "deploy/operations.md",
+      "bytes": 10297,
+      "sha256": "38bccd873a467aba96b689aad9ff724aa717217d33772e714e1045b98d75c5f5"
+    },
+    {
+      "path": "deploy/operations.mjs",
+      "bytes": 7055,
+      "sha256": "85cccd43b8960b33321a6ce421fb4db9d7c2c9bb2a4ec77cdba9b67a1ee81a70"
     },
     {
       "path": "deploy/package-release.mjs",
@@ -390,13 +410,18 @@
     },
     {
       "path": "deploy/release-content/README.md",
-      "bytes": 8129,
-      "sha256": "aef358929ec61388440a7eaaef4d5724e1d489097697099200e5a817a5beb2fc"
+      "bytes": 8461,
+      "sha256": "1087b31851f4e89a46e5292e6b68f32c51971a5fa55693e4bd42293457dad601"
     },
     {
       "path": "deploy/release-content/ci.yml",
       "bytes": 516,
       "sha256": "347336986f7bc4ca74758c04e10b4a726922e5bd583166ba839ab478cf7f25f8"
+    },
+    {
+      "path": "deploy/release-content/operations.md",
+      "bytes": 10297,
+      "sha256": "38bccd873a467aba96b689aad9ff724aa717217d33772e714e1045b98d75c5f5"
     },
     {
       "path": "deploy/release-content/package-lock.json",
@@ -410,13 +435,23 @@
     },
     {
       "path": "deploy/release-files.json",
-      "bytes": 4369,
-      "sha256": "20ff44d682798b63c173a349e4bf048db64a0138bba8898fc1c811f1beb67f1c"
+      "bytes": 4554,
+      "sha256": "dc4f1f78efc10dc4596e5d7f1483c82e081da07cf7748406434a4fa69e73febd"
+    },
+    {
+      "path": "deploy/restore.mjs",
+      "bytes": 9684,
+      "sha256": "5bb8a53233a2e5482de1a4b4b8ee6622ff91b68b5bbffeefb60781e2ed36a602"
     },
     {
       "path": "deploy/test/caddy-config.test.mjs",
       "bytes": 3953,
       "sha256": "fb551757a541e879f41d3faaaac13776a17d9edd5116aee1f341c6a6744b9f26"
+    },
+    {
+      "path": "deploy/test/operations.test.mjs",
+      "bytes": 14792,
+      "sha256": "01b7cfcce8b35af37ae8a89b8d7a8bf0deb5c7fbb38ef100b75eccc7fc61e0c3"
     },
     {
       "path": "deploy/test/package-release.test.mjs",

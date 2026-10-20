@@ -83,3 +83,7 @@ node deploy/package-release.mjs --out <全新目录>
 工具拒绝越界路径、符号链接/目录联接、硬链接、冲突目标及已有输出目录；这些检查不替代对恶意并发写入者的系统隔离。依赖继续受各自上游许可证约束。
 
 `deploy/release-files.json` 中的 `release` 元数据记录此次发布设置；移除该元数据时，打包器仍默认生成审阅状态的本地包。修改发布范围或第三方材料时应重新核对相应许可。打包器只生成本地目录，不上传代码、不创建远程仓库、不推送，也不激活模型授权。
+
+## Operations and recovery
+
+Use [the operations guide](deploy/operations.md) for health checks, consistent encrypted backups, offline restore drills, and update/rollback procedures. Backups include application credentials and must remain private. A completed offline restore does not start the service or refresh model credentials.

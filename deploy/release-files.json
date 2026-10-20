@@ -113,7 +113,17 @@
     "packages/contracts/src/index.ts",
     "packages/contracts/tsconfig.json",
     "scripts/server.mjs",
-    "scripts/setup.mjs"
+    "scripts/setup.mjs",
+    "deploy/operations.mjs",
+    "deploy/backup.mjs",
+    "deploy/restore.mjs",
+    "deploy/check-health.mjs",
+    "deploy/test/operations.test.mjs",
+    "deploy/release-content/operations.md",
+    {
+      "source": "deploy/release-content/operations.md",
+      "destination": "deploy/operations.md"
+    }
   ],
   "release": {
     "license": "MIT",
