@@ -46,6 +46,11 @@ CMD ["node", "deploy/entrypoint.mjs"]
 # Optional isolated model runner: no API database or device connection key.
 FROM server AS runner
 USER root
+# Codex's native TLS stack needs system CA roots in addition to Node's bundled roots.
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends ca-certificates \
+    && test -s /etc/ssl/certs/ca-certificates.crt \
+    && rm -rf /var/lib/apt/lists/*
 ARG CODEX_VERSION=0.154.0
 RUN npm install --global --ignore-scripts --no-audit --no-fund "@openai/codex@${CODEX_VERSION}" \
     && codex --version \

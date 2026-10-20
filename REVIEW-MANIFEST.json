@@ -315,8 +315,8 @@
     },
     {
       "path": "deploy/Dockerfile",
-      "bytes": 3119,
-      "sha256": "f782605bd3184a6c32115c483d179d1573a4359bf42bfc785ec4bd6426f4603a"
+      "bytes": 3389,
+      "sha256": "6aec89e3f0c0f08dcb2e691eed49c55ba2462d61926a35dc49c39aeb8fe4b8e1"
     },
     {
       "path": "deploy/Dockerfile.dockerignore",
@@ -375,8 +375,8 @@
     },
     {
       "path": "deploy/release-content/Dockerfile",
-      "bytes": 3119,
-      "sha256": "f782605bd3184a6c32115c483d179d1573a4359bf42bfc785ec4bd6426f4603a"
+      "bytes": 3389,
+      "sha256": "6aec89e3f0c0f08dcb2e691eed49c55ba2462d61926a35dc49c39aeb8fe4b8e1"
     },
     {
       "path": "deploy/release-content/Dockerfile.dockerignore",
