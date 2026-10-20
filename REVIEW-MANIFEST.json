@@ -295,8 +295,8 @@
     },
     {
       "path": "deploy/Caddy.Dockerfile",
-      "bytes": 447,
-      "sha256": "6f35aa5490ae47e62dfe111ba3157db7dc151a67e623f9c53baa22f42fbb62f4"
+      "bytes": 736,
+      "sha256": "dc0993f09eed84b94786d09b626c7aea6ae3fe617bc766615756d288dbe4d4c8"
     },
     {
       "path": "deploy/Caddy.Dockerfile.dockerignore",
