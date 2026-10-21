@@ -40,8 +40,8 @@
     },
     {
       "path": "apps/server/src/app.ts",
-      "bytes": 6441,
-      "sha256": "dccc832a5a31472bba92f8c2f58d05afe0c66e3c1f880cce73423d2002efe718"
+      "bytes": 7460,
+      "sha256": "3f5245ac0a5a824dee540aeaf40ce77f7dec3ed52865a3ec944fcbc488fbfb4f"
     },
     {
       "path": "apps/server/src/auth/cli.ts",
@@ -100,8 +100,13 @@
     },
     {
       "path": "apps/server/src/main.ts",
-      "bytes": 2376,
-      "sha256": "640815be7a3b66a82d29420f17d8495d957afeb40d0fb8d0ee58144b120abd05"
+      "bytes": 2543,
+      "sha256": "7c86ded54d8fdc9eaed512b7e6ed2d989c48be0216731305e779f7fd0e5179a5"
+    },
+    {
+      "path": "apps/server/src/notifications.ts",
+      "bytes": 7459,
+      "sha256": "f1db539f9736534d2a11c2d8fa3a9138ef4a2241657781b339f2e96f7e80b0d9"
     },
     {
       "path": "apps/server/src/operations.ts",
@@ -234,6 +239,11 @@
       "sha256": "649a1473ca050416edef404dfa9112e4b3a9cf74c4382604cd06f9b3c2ad90cd"
     },
     {
+      "path": "apps/server/test/notifications.test.ts",
+      "bytes": 15311,
+      "sha256": "48d154be155b0dc7588f12bca670ea8100362116c15e276e25bee7ffb6cd9631"
+    },
+    {
       "path": "apps/server/test/operations.test.ts",
       "bytes": 13492,
       "sha256": "6382dcd4bb1dd166ad0fa89e254c23787b86795f0a17af41d19646046b3655d9"
@@ -335,8 +345,8 @@
     },
     {
       "path": "deploy/backup.mjs",
-      "bytes": 7271,
-      "sha256": "ede6837454096563beefe7ea125782471f073ae29fc2647e27131998feb2af2c"
+      "bytes": 7575,
+      "sha256": "a85ab44279407b7ef40594895b54b8d63da62a8a7b4aee0869db255930f48cc1"
     },
     {
       "path": "deploy/check-health.mjs",
@@ -380,8 +390,8 @@
     },
     {
       "path": "deploy/operations.md",
-      "bytes": 16151,
-      "sha256": "6471b15a909a05658a9361e8a00d0014faa3791da905500aba48c1d6bbc0ecf6"
+      "bytes": 17360,
+      "sha256": "8caaabf3bb7b615495b43ee3e35d3b2428a57a46985e491534a54cda10b02c47"
     },
     {
       "path": "deploy/operations.mjs",
@@ -435,8 +445,8 @@
     },
     {
       "path": "deploy/release-content/operations.md",
-      "bytes": 16151,
-      "sha256": "6471b15a909a05658a9361e8a00d0014faa3791da905500aba48c1d6bbc0ecf6"
+      "bytes": 17360,
+      "sha256": "8caaabf3bb7b615495b43ee3e35d3b2428a57a46985e491534a54cda10b02c47"
     },
     {
       "path": "deploy/release-content/package-lock.json",
@@ -450,13 +460,13 @@
     },
     {
       "path": "deploy/release-files.json",
-      "bytes": 4801,
-      "sha256": "d7fe9a084bbe3da94ff3fd47320f8213b74c760a008e8fa1c43aa1c7f7c94a10"
+      "bytes": 4934,
+      "sha256": "2b021b2a32de777ddc6120143bd5415e79905a9dc31153872d2577aaf8d558c6"
     },
     {
       "path": "deploy/restore.mjs",
-      "bytes": 9684,
-      "sha256": "5bb8a53233a2e5482de1a4b4b8ee6622ff91b68b5bbffeefb60781e2ed36a602"
+      "bytes": 12819,
+      "sha256": "caa5ceabeda5fd7f3d52bafbbae5cb128fb07f878ebe54571d1a4b41d9e8963a"
     },
     {
       "path": "deploy/scheduled-operations.mjs",
@@ -470,8 +480,8 @@
     },
     {
       "path": "deploy/test/operations.test.mjs",
-      "bytes": 14792,
-      "sha256": "01b7cfcce8b35af37ae8a89b8d7a8bf0deb5c7fbb38ef100b75eccc7fc61e0c3"
+      "bytes": 19100,
+      "sha256": "79f0a05cc33f5d0445f750eb419a366921a60d70eb19eb09bff487c9c79ac1ca"
     },
     {
       "path": "deploy/test/package-release.test.mjs",
@@ -515,8 +525,13 @@
     },
     {
       "path": "packages/contracts/src/index.ts",
-      "bytes": 2445,
-      "sha256": "e93b009667d00426cf2de6f905071f2ee6a29d22ce7e6dd9a3b3f91577b42805"
+      "bytes": 2482,
+      "sha256": "25ad253f69724efd9c63faf98cc1d6f2d7e5d60d383cccd976e82da014f6ea45"
+    },
+    {
+      "path": "packages/contracts/src/notifications.ts",
+      "bytes": 2857,
+      "sha256": "314081cc1f62732ff7e1fbf71a620f08a8360e2b50760d6e263536b5bb68c832"
     },
     {
       "path": "packages/contracts/src/operations.ts",

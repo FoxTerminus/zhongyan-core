@@ -4,6 +4,7 @@ import { createApp } from './app.js';
 import { loadConfig } from './config.js';
 import { Store } from './store.js';
 import { KnowledgeStore } from './knowledge.js';
+import { NotificationStore } from './notifications.js';
 import { CodexRuntime } from './runtime/codex.js';
 import { DisabledRuntime } from './runtime/unavailable.js';
 import { RemoteRuntime } from './runtime/remote.js';
@@ -16,6 +17,7 @@ mkdirSync(config.dataDir, { recursive: true });
 const runtimeDir = join(config.dataDir, 'workspace');
 mkdirSync(runtimeDir, { recursive: true });
 const knowledge = new KnowledgeStore(join(config.dataDir, 'knowledge.sqlite'));
+const notifications = new NotificationStore(join(config.dataDir, 'notifications.sqlite'));
 const runtime = config.runtime === 'remote'
   ? new RemoteRuntime({ url: config.runnerUrl!, token: config.runnerToken!,
     turnTimeoutMs: config.runnerTurnTimeoutMs, maxOutputBytes: config.runnerMaxOutputBytes })
@@ -29,6 +31,7 @@ const runtime = config.runtime === 'remote'
   : new DisabledRuntime();
 const app = createApp({ store: new Store(join(config.dataDir, 'agent.sqlite')), runtime,
   knowledge,
+  notifications,
   operationsDir: config.operationsDir,
   authToken: config.authToken, allowedOrigins: config.allowedOrigins });
 let closing = false;

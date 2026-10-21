@@ -129,7 +129,10 @@
     "apps/server/test/operations.test.ts",
     "deploy/scheduled-operations.mjs",
     "deploy/install-schedule.mjs",
-    "deploy/test/scheduled-operations.test.mjs"
+    "deploy/test/scheduled-operations.test.mjs",
+    "packages/contracts/src/notifications.ts",
+    "apps/server/src/notifications.ts",
+    "apps/server/test/notifications.test.ts"
   ],
   "release": {
     "license": "MIT",

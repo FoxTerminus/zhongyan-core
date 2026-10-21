@@ -40,7 +40,7 @@ sudo node deploy/backup.mjs --root "$PWD" \
 
 | 范围 | 需要一起保留的内容 |
 |---|---|
-| `agent_data` | 任务、会话、消息、事件、资料库以及 SQLite WAL/SHM |
+| `agent_data` | 任务、会话、消息、事件、资料库、已启用的通知库以及 SQLite WAL/SHM |
 | `runner_state` | 独立应用 profile、VM host 身份、Codex 线程历史和运行状态 |
 | `runner_workspace` | 执行器工作资料 |
 | `caddy_data`、`caddy_config` | ACME 账户、证书私钥及代理持久状态 |
@@ -52,7 +52,8 @@ sudo node deploy/backup.mjs --root "$PWD" \
 2. 创建独占操作锁，记录原容器、运行状态及镜像摘要。按 proxy → server → runner 停止原本运行的服务；确认卷没有其他运行容器写入。
 3. 将完整卷复制至 0700 临时目录，保留所有权、模式和时间戳。SQLite 与 runner 状态均停止写入后才复制，不能只复制正在工作的 `.sqlite` 文件。
 4. 不论停止/复制成功与否，尝试按 runner → server → proxy 启动所有原本运行的容器；原本停止的服务保持停止。恢复启动失败会明确报错，不返回成功。
-5. 对独立副本生成 age 加密归档，输出 SHA256/大小清单，再清理明文暂存。加密期间线上服务已经恢复。
+5. 服务恢复后，读取独立副本的 `PRAGMA user_version`，校验固定业务库的版本、表列、完整性和外键；生成 `databaseSchemas` 清单。始终要求 `agent.sqlite`、`knowledge.sqlite`，存在 `notifications.sqlite` 时一并要求其 schema 兼容。未知版本或缺表使本次备份失败，不延长停服时间。
+6. 把相同数据库清单同时写入归档内的 `metadata.json` 和外部 `manifest.json`，生成 age 加密归档并输出 SHA256/大小，再清理明文暂存。检查和加密期间线上服务已经恢复。
 
 手工备份会短暂停服，并使当时正在执行的任务成为中断状态。自动备份先建立维护闸门，确认队列、执行任务和 worker 全部空闲后才停服；忙时不停止服务，下一轮重试。安排在空闲时进行，和升级串行；不要同时手动操作容器或写入卷。每条外部操作有超时，加密/复制/解密/解包各次最长 10 分钟；普通命令通常 30 秒。备份收到 SIGINT/SIGTERM 后会在当前有界步骤结束后取消并恢复服务。SIGKILL、宿主断电或磁盘故障无法保证 finally 执行：检查原服务状态、残留 `.operations-lock` 和明文 `.staging`，确认没有存活运维进程后再人工处理，不能盲删锁后并发运行。
 
@@ -115,7 +116,9 @@ sudo node deploy/restore.mjs \
 
 它校验清单、密文大小与 SHA256，再解密到全新受保护目录。脚本拒绝已有输出目录，GNU tar 的 `--keep-old-files` 还会拒绝覆盖解包目标中的已有文件；不与互斥的 `--no-overwrite-dir` 同时使用。tar 解包在临时容器中进行：无网络、只读根、没有线上卷或 Docker socket，只挂载归档只读和全新恢复目录可写；仅保留还原文件所有权所需的 capability。容器使用清单记录的本地 server 镜像，`--pull never`，不会下载或启动应用。若旧镜像已不在本机，先按对应源码准备可信兼容镜像，再显式提供 `--image`。
 
-成功后 `contents/volumes/` 包含五卷离线副本，`contents/deployment/` 包含部署文件，`RESTORE-READY.json` 记录两份 SQLite 的版本、必要业务表/列、`PRAGMA integrity_check` 和 `foreign_key_check` 检查结果。恢复校验不会创建缺失表或自动迁移；数据库版本变化时应同步更新兼容性检查，并使用与备份匹配的工具。检查也会拒绝主库及 WAL/SHM/journal 旁文件的链接或特殊文件。
+成功后 `contents/volumes/` 包含五卷离线副本，`contents/deployment/` 包含部署文件，`RESTORE-READY.json` 记录实际两份或三份 SQLite 的版本、必要业务表/列、`PRAGMA integrity_check` 和 `foreign_key_check` 检查结果。新版备份必须满足归档内外 `databaseSchemas` 完全一致；清单声明通知库但文件缺失、出现未声明的通知库、只删改外部清单字段均拒绝恢复。无此字段的历史归档与历史清单仍兼容，但如实际含通知库也必须检查其版本和完整性。恢复校验不会创建缺失表或自动迁移；数据库版本变化时应同步更新兼容性检查，并使用与备份匹配的工具。检查也会拒绝主库及 WAL/SHM/journal 旁文件的链接或特殊文件。
+
+通知库属于敏感用户数据，只通过已授权的通知接入保存。在线清除按安装实例删除记录；30 天在线保留期及 10000 条上限不意味着旧加密备份中的历史通知会立即消失。自动副本仍按最近 7 份成功备份保留；手工备份及复制到独立设备的副本需要用户单独管理。通知正文不会因备份或恢复而触发模型、发送消息或授权工具操作。
 
 解包中间明文 tar 会清理，恢复数据仍是敏感明文，整个父目录必须保持 0700。恢复收到 SIGINT/SIGTERM 会终止当前外部操作、检查并删除本次独立容器，再清理中间归档；若 Docker 无法确认清理，错误会给出该临时容器名，必须人工检查。SIGKILL 或断电仍可能遗留容器及中间归档。失败时不创建 READY 标记，隔离副本可能不完整；线上服务不会被替换。
 

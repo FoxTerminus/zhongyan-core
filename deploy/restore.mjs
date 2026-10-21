@@ -20,6 +20,23 @@ const DATABASES = {
     notes_fts: ['title', 'body', 'source'],
   },
 };
+// Older backups predate notification intake. When present, its content must be
+// verified just as strictly; absence is allowed only for backward compatibility.
+const NOTIFICATION_TABLES = {
+  notifications: ['seq', 'id', 'device_id', 'event_id', 'package_name', 'app_name', 'title', 'text', 'posted_at', 'received_at'],
+};
+
+export function validateDatabaseSchemas(value) {
+  const names = ['agent.sqlite', 'knowledge.sqlite', 'notifications.sqlite'];
+  if (!Array.isArray(value) || value.length < 2 || value.length > 3 || value.some(item =>
+    !item || typeof item !== 'object' || Object.keys(item).sort().join(',') !== 'name,version' ||
+    !names.includes(item.name) || item.version !== 1) ||
+    new Set(value.map(item => item.name)).size !== value.length ||
+    !value.some(item => item.name === 'agent.sqlite') || !value.some(item => item.name === 'knowledge.sqlite')) {
+    throw new OperationsError('备份数据库清单不兼容；仅接受固定业务数据库及受支持版本。');
+  }
+  return value.map(({ name, version }) => ({ name, version })).sort((a, b) => a.name.localeCompare(b.name));
+}
 
 export function validateManifest(value) {
   if (!value || value.version !== 1 || value.archive !== 'snapshot.tar.gz.age'
@@ -31,12 +48,43 @@ export function validateManifest(value) {
   }
   const image = value.services?.find(item => item.service === 'server')?.image;
   if (!/^sha256:[a-f0-9]{64}$/.test(image)) throw new OperationsError('备份未记录有效的服务镜像摘要。');
+  if (value.databaseSchemas !== undefined) validateDatabaseSchemas(value.databaseSchemas);
   return value;
 }
-export async function verifyDatabases(contents) {
+/** The encrypted archive carries the same inventory as its public manifest.
+ * Removing/changing only the outer declaration cannot downgrade verification.
+ */
+export async function verifyArchiveDatabaseSchemas(contents, manifest) {
+  const path = join(contents, 'metadata.json');
+  await ordinaryFile(path, 64 * 1024);
+  let metadata;
+  try { metadata = JSON.parse(await readFile(path, 'utf8')); }
+  catch { throw new OperationsError('归档内部元数据无效。'); }
+  if (!metadata || metadata.version !== 1) throw new OperationsError('归档内部元数据版本不兼容。');
+  const outer = manifest.databaseSchemas, inner = metadata.databaseSchemas;
+  if (outer === undefined && inner === undefined) return undefined;
+  if (outer === undefined || inner === undefined ||
+    JSON.stringify(validateDatabaseSchemas(outer)) !== JSON.stringify(validateDatabaseSchemas(inner))) {
+    throw new OperationsError('归档内部与外部的数据库清单不一致，未声明恢复成功。');
+  }
+  return validateDatabaseSchemas(inner);
+}
+export async function verifyDatabases(contents, inventory) {
   const { DatabaseSync } = await import('node:sqlite');
   const directory = await realDirectory(join(contents, 'volumes/agent_data'));
-  for (const [filename, tables] of Object.entries(DATABASES)) {
+  const databases = { ...DATABASES };
+  try {
+    await ordinaryFile(join(directory, 'notifications.sqlite'));
+    databases['notifications.sqlite'] = NOTIFICATION_TABLES;
+  } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  if (inventory !== undefined) {
+    const expected = validateDatabaseSchemas(inventory).map(item => item.name).sort();
+    if (JSON.stringify(expected) !== JSON.stringify(Object.keys(databases).sort())) {
+      throw new OperationsError('恢复副本缺少已声明数据库或含未声明数据库，未声明恢复成功。');
+    }
+  }
+  const databaseSchemas = [];
+  for (const [filename, tables] of Object.entries(databases)) {
     const path = join(directory, filename);
     await ordinaryFile(path);
     for (const suffix of ['-wal', '-shm', '-journal']) {
@@ -46,7 +94,8 @@ export async function verifyDatabases(contents) {
     const db = new DatabaseSync(path, { readOnly: true });
     try {
       db.exec('PRAGMA busy_timeout=1000; PRAGMA query_only=ON;');
-      if (db.prepare('PRAGMA user_version').get().user_version !== 1) throw new OperationsError('恢复副本的 SQLite 版本不兼容，请使用对应版本工具。');
+      const version = db.prepare('PRAGMA user_version').get().user_version;
+      if (version !== 1) throw new OperationsError('恢复副本的 SQLite 版本不兼容，请使用对应版本工具。');
       for (const [table, required] of Object.entries(tables)) {
         const type = db.prepare('SELECT type FROM sqlite_schema WHERE name=?').get(table)?.type;
         const columns = db.prepare('SELECT name FROM pragma_table_info(?)').all(table).map(row => row.name);
@@ -55,8 +104,10 @@ export async function verifyDatabases(contents) {
       const rows = db.prepare('PRAGMA integrity_check').all();
       if (rows.length !== 1 || Object.values(rows[0])[0] !== 'ok') throw new OperationsError('恢复副本的 SQLite 完整性检查失败。');
       if (db.prepare('PRAGMA foreign_key_check').get()) throw new OperationsError('恢复副本的 SQLite 外键检查失败。');
+      databaseSchemas.push({ name: filename, version });
     } finally { db.close(); }
   }
+  return validateDatabaseSchemas(databaseSchemas);
 }
 export async function removeRestoreContainer(name, run = command) {
   const inspect = () => run('docker', ['ps', '--all', '--quiet', '--filter', 'name=^/' + name + '$']);
@@ -116,9 +167,10 @@ export async function restoreBackup(backupValue, outputValue, identityValue, ima
       }
       checkCancellation();
       for (const name of VOLUMES) await realDirectory(join(contents, 'volumes', name));
-      await verifyDatabases(contents);
+      const inventory = await verifyArchiveDatabaseSchemas(contents, manifest);
+      const databaseSchemas = await verifyDatabases(contents, inventory);
       checkCancellation();
-      result = { ok: true, offline: true, sqliteIntegrity: 'ok', sqliteSchema: 'compatible', sqliteForeignKeys: 'ok', sourceCreatedAt: manifest.createdAt,
+      result = { ok: true, offline: true, sqliteIntegrity: 'ok', sqliteSchema: 'compatible', sqliteForeignKeys: 'ok', databaseSchemas, sourceCreatedAt: manifest.createdAt,
         warnings: ['尚未替换线上卷或启动应用。', '旧备份中的轮转 refresh token 可能已失效；新主机必须准备自己的 host ID。',
           '恢复演练不得启动第二个使用同一授权的 runner。'] };
     } finally { await unlink(archive).catch(error => { if (error.code !== 'ENOENT') throw error; }); }

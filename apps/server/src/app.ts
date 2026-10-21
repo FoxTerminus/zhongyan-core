@@ -1,13 +1,14 @@
 import Fastify from 'fastify';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { z, ZodError } from 'zod';
-import { CreateConversationSchema, SendMessageSchema, KnowledgeInputSchema, ReviseKnowledgeSchema, PROTOCOL_VERSION } from '@personal-agent/contracts';
+import { CreateConversationSchema, SendMessageSchema, KnowledgeInputSchema, ReviseKnowledgeSchema, NotificationBatchSchema, NotificationQuerySchema, ClearNotificationsSchema, PROTOCOL_VERSION } from '@personal-agent/contracts';
 import { DomainError } from './errors.js';
 import { Store } from './store.js';
 import { KnowledgeStore } from './knowledge.js';
 import type { AgentRuntime } from './runtime/types.js';
 import { Worker } from './worker.js';
 import { OperationsReader } from './operations.js';
+import { NotificationStore } from './notifications.js';
 
 interface AppOptions {
   store: Store;
@@ -17,6 +18,7 @@ interface AppOptions {
   startWorker?: boolean;
   allowedOrigins?: string[];
   operationsDir?: string;
+  notifications?: NotificationStore;
 }
 const IdParams = z.object({ id: z.uuid() });
 const CursorQuery = z.object({ after: z.coerce.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0) });
@@ -57,6 +59,21 @@ export function createApp(options: AppOptions) {
     z.object({}).strict().parse(request.query);
     return operations.snapshot({ ...store.taskCounts(), workerBusy: worker.isBusy() });
   });
+  const notifications = () => {
+    if (!options.notifications) throw new DomainError('notifications_unavailable', '通知存储尚未启用。', 503);
+    return options.notifications;
+  };
+  app.post('/v1/notifications/batches', async request => {
+    const input = NotificationBatchSchema.parse(request.body);
+    operations.assertAcceptingTasks();
+    return notifications().ingest(input);
+  });
+  app.get('/v1/notifications', async request => notifications().list(NotificationQuerySchema.parse(request.query)));
+  app.get('/v1/notifications/devices', async request => {
+    z.object({}).strict().parse(request.query);
+    return notifications().devices();
+  });
+  app.post('/v1/notifications/clear', async request => notifications().clear(ClearNotificationsSchema.parse(request.body).deviceId));
   const knowledge = () => {
     if (!options.knowledge) throw new DomainError('unavailable', '资料库尚未启用。', 503);
     return options.knowledge;
@@ -90,6 +107,6 @@ export function createApp(options: AppOptions) {
   });
   app.get('/v1/tasks/:id/events', async request => store.events(IdParams.parse(request.params).id, CursorQuery.parse(request.query).after));
   app.addHook('onReady', async () => { if (options.startWorker !== false) worker.start(); });
-  app.addHook('onClose', async () => { await worker.close(); store.close(); options.knowledge?.close(); });
+  app.addHook('onClose', async () => { await worker.close(); store.close(); options.knowledge?.close(); options.notifications?.close(); });
   return app;
 }

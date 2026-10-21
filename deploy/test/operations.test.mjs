@@ -7,7 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { EventEmitter } from 'node:events';
 import { VOLUMES, createPrivateDirectory, checkPrivateDirectoryOwner, digest, withCancellation, command } from '../operations.mjs';
 import { withStoppedServices } from '../backup.mjs';
-import { validateManifest, verifyDatabases, extractionArguments, tarExtractionArguments, removeRestoreContainer } from '../restore.mjs';
+import { validateManifest, validateDatabaseSchemas, verifyArchiveDatabaseSchemas, verifyDatabases, extractionArguments, tarExtractionArguments, removeRestoreContainer } from '../restore.mjs';
 import { healthyContainer, checkHealth } from '../check-health.mjs';
 
 const directory = fileURLToPath(new URL('../', import.meta.url));
@@ -100,6 +100,19 @@ test('manifest requires complete known volumes, bounded sizes and an image diges
   assert.equal(validateManifest(valid), valid);
   for (const invalid of [{ ...valid, archive: '../escape' }, { ...valid, volumes: valid.volumes.slice(1) },
     { ...valid, snapshotBytes: Number.MAX_SAFE_INTEGER }, { ...valid, services: [] }, { ...valid, sha256: 'bad' }]) assert.throws(() => validateManifest(invalid));
+  const required = [{ name: 'agent.sqlite', version: 1 }, { name: 'knowledge.sqlite', version: 1 }];
+  const all = [...required, { name: 'notifications.sqlite', version: 1 }];
+  assert.doesNotThrow(() => validateManifest({ ...valid, databaseSchemas: required }));
+  assert.doesNotThrow(() => validateManifest({ ...valid, databaseSchemas: all }));
+  for (const databaseSchemas of [null, [], [required[0]], [...required, required[0]],
+    [...required, { name: '../notifications.sqlite', version: 1 }],
+    [...required, { name: 'other.sqlite', version: 1 }],
+    [...required, { name: 'notifications.sqlite', version: 2 }],
+    [required[0], { name: 'knowledge.sqlite', version: 0 }],
+    [required[0], { name: 'knowledge.sqlite', version: 1, path: '../outside' }]]) {
+    assert.throws(() => validateManifest({ ...valid, databaseSchemas }));
+  }
+  assert.deepEqual(validateDatabaseSchemas([...required].reverse()), required);
 });
 test('checksum changes when an encrypted-file fixture is corrupted', async t => {
   const parent = await fixture(t), path = join(parent, 'synthetic.age');
@@ -122,6 +135,53 @@ test('empty, wrong-version and incomplete business databases are not restore-rea
   await assert.rejects(verifyDatabases(parent), /业务表或列/);
   await writeFile(path, ''); // An empty SQLite file can pass integrity_check but has no business data.
   await assert.rejects(verifyDatabases(parent));
+});
+
+test('notification database is optional in historical backups but fully validated when present', async t => {
+  const { parent, data } = await databases(t);
+  await verifyDatabases(parent); // Pre-notification snapshots remain recoverable.
+  const path = join(data, 'notifications.sqlite'), db = new DatabaseSync(path);
+  db.exec(`CREATE TABLE notifications(seq INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT UNIQUE,device_id TEXT,event_id TEXT,
+    package_name TEXT,app_name TEXT,title TEXT,text TEXT,posted_at TEXT,received_at TEXT);
+    PRAGMA user_version=1;`);
+  db.close();
+  await verifyDatabases(parent);
+  const changed = new DatabaseSync(path); changed.exec('PRAGMA user_version=2'); changed.close();
+  await assert.rejects(verifyDatabases(parent), /版本不兼容/);
+  const missing = new DatabaseSync(path); missing.exec('PRAGMA user_version=1; DROP TABLE notifications;'); missing.close();
+  await assert.rejects(verifyDatabases(parent), /业务表或列/);
+});
+
+test('declared inventories require every named database and reject undeclared notification data', async t => {
+  const { parent, data } = await databases(t);
+  const legacy = await verifyDatabases(parent);
+  assert.deepEqual(legacy, [{ name: 'agent.sqlite', version: 1 }, { name: 'knowledge.sqlite', version: 1 }]);
+  const three = [...legacy, { name: 'notifications.sqlite', version: 1 }];
+  await assert.rejects(verifyDatabases(parent, three), /缺少已声明数据库/);
+  assert.deepEqual(await verifyDatabases(parent, legacy), legacy);
+  const path = join(data, 'notifications.sqlite'), db = new DatabaseSync(path);
+  db.exec(`CREATE TABLE notifications(seq INTEGER PRIMARY KEY AUTOINCREMENT,id TEXT UNIQUE,device_id TEXT,event_id TEXT,
+    package_name TEXT,app_name TEXT,title TEXT,text TEXT,posted_at TEXT,received_at TEXT); PRAGMA user_version=1;`);
+  db.close();
+  assert.deepEqual(await verifyDatabases(parent, three), three);
+  await assert.rejects(verifyDatabases(parent, legacy), /含未声明数据库/);
+  const changed = new DatabaseSync(path); changed.exec('PRAGMA user_version=2'); changed.close();
+  await assert.rejects(verifyDatabases(parent, three), /版本不兼容/);
+});
+
+test('encrypted metadata and outer inventory must agree, including declaration removal/downgrade', async t => {
+  const parent = await fixture(t), path = join(parent, 'metadata.json');
+  const required = [{ name: 'agent.sqlite', version: 1 }, { name: 'knowledge.sqlite', version: 1 }];
+  const all = [...required, { name: 'notifications.sqlite', version: 1 }];
+  await writeFile(path, JSON.stringify({ version: 1 }));
+  assert.equal(await verifyArchiveDatabaseSchemas(parent, {}), undefined); // Old archive+old manifest.
+  await assert.rejects(verifyArchiveDatabaseSchemas(parent, { databaseSchemas: required }), /不一致/);
+  await writeFile(path, JSON.stringify({ version: 1, databaseSchemas: all }));
+  assert.deepEqual(await verifyArchiveDatabaseSchemas(parent, { databaseSchemas: [...all].reverse() }), all);
+  await assert.rejects(verifyArchiveDatabaseSchemas(parent, {}), /不一致/);
+  await assert.rejects(verifyArchiveDatabaseSchemas(parent, { databaseSchemas: required }), /不一致/);
+  await writeFile(path, '{broken-json');
+  await assert.rejects(verifyArchiveDatabaseSchemas(parent, { databaseSchemas: all }), /元数据无效/);
 });
 test('foreign key corruption is rejected even when SQLite physical integrity passes', async t => {
   const { parent, data } = await databases(t);

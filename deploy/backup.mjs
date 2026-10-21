@@ -3,6 +3,7 @@ import { resolve, dirname, join, relative, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { OperationsError, CONFIG_FILES, requireLinuxRoot, command, discovery, recipient, realDirectory, privateDirectory, createPrivateDirectory, ordinaryFile, checkSpace, digest, encryptedArchive } from './operations.mjs';
+import { verifyDatabases } from './restore.mjs';
 
 /** Always attempt to restart every originally running service, even after stop/copy errors. */
 export async function withStoppedServices(services, run, snapshot, afterRestart = async () => {}) {
@@ -83,10 +84,14 @@ export async function backupDeployment(rootValue, outputValue, recipientFile, ho
       }
       await mkdir(join(stage, 'deployment/.secrets'), { recursive: true, mode: 0o700 });
       for (const file of CONFIG_FILES) await copyFile(join(root, 'deploy', file), join(stage, 'deployment', file));
-      await writeFile(join(stage, 'metadata.json'), JSON.stringify(metadata, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
     }, hooks.afterRestart);
     checkCancellation();
-    // Writers have resumed; encrypt the independent immutable copy.
+    // Services have resumed before inspecting the independent copy: unsupported
+    // database versions must fail this backup without extending the outage.
+    metadata.databaseSchemas = await verifyDatabases(stage);
+    checkCancellation();
+    await writeFile(join(stage, 'metadata.json'), JSON.stringify(metadata, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
+    // Encrypt the same inventory with the data; restore compares it to manifest.
     const archive = join(output, 'snapshot.tar.gz.age');
     await encryptedArchive(stage, archive, resolve(recipientFile));
     checkCancellation();
