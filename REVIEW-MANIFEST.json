@@ -60,8 +60,8 @@
     },
     {
       "path": "apps/server/src/auth/profile-store.ts",
-      "bytes": 15275,
-      "sha256": "4757726d2aa57912daf5d294299aff32b67c6549d6c25517999f5bcbb2dbe905"
+      "bytes": 15590,
+      "sha256": "467924af5e4577fb9fe8afb330a90b8e5d02e4bef5326628823fba8e24818bca"
     },
     {
       "path": "apps/server/src/auth/profile-transfer.ts",
@@ -255,8 +255,8 @@
     },
     {
       "path": "apps/server/test/profile-store.test.ts",
-      "bytes": 13615,
-      "sha256": "fd6f22d8c7a102fe48774a92262a1723e15188aa125bce24fb258b729a559f3f"
+      "bytes": 14867,
+      "sha256": "bd41e2e41dd351d0ae50c866dbdb31b8cc72fcea363e6e35c96a1482233ffb05"
     },
     {
       "path": "apps/server/test/profile-transfer.test.ts",

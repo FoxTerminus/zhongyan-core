@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { fork } from 'node:child_process';
+import filesystem from 'node:fs/promises';
+import { syncBuiltinESMExports } from 'node:module';
 import { once } from 'node:events';
 import { randomUUID } from 'node:crypto';
 import { chmod, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, symlink, writeFile } from 'node:fs/promises';
@@ -174,6 +176,31 @@ describe('isolated plan profile store', { concurrency: false }, () => {
     const failure = new Error('test domain failure');
     await assert.rejects(store.withLock(async () => { throw failure; }), error => error === failure);
     await other.withLock(async () => undefined);
+    assert.equal((await readdir(directory)).includes('.profile-lock'), false);
+  });
+
+  it('retries when an owner releases the lock between EEXIST and inspection', async t => {
+    await store.hostId();
+    const lock = join(directory, '.profile-lock');
+    await mkdir(lock);
+    const originalMkdir = filesystem.mkdir;
+    let releasedDuringContention = false;
+    t.mock.method(filesystem, 'mkdir', (async (target: Parameters<typeof mkdir>[0], options?: Parameters<typeof mkdir>[1]) => {
+      try { return await originalMkdir(target, options); }
+      catch (error) {
+        if (target === lock && !releasedDuringContention && (error as NodeJS.ErrnoException).code === 'EEXIST') {
+          await filesystem.rmdir(lock);
+          releasedDuringContention = true;
+        }
+        throw error;
+      }
+    }) as typeof mkdir);
+    syncBuiltinESMExports();
+    let entered = false;
+    try { await new FilePlanProfileStore(directory).withLock(async () => { entered = true; }); }
+    finally { t.mock.restoreAll(); syncBuiltinESMExports(); }
+    assert.equal(releasedDuringContention, true);
+    assert.equal(entered, true);
     assert.equal((await readdir(directory)).includes('.profile-lock'), false);
   });
 

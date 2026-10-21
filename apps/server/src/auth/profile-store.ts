@@ -204,10 +204,16 @@ export class FilePlanProfileStore {
             break;
           } catch (error) {
             if (code(error) !== 'EEXIST') throw error;
-            const stat = await lstat(path);
-            if (stat.isSymbolicLink() || !stat.isDirectory()) throw new ProfileStoreError();
             if (Date.now() - started >= LOCK_WAIT_MS) {
               throw new ProfileStoreError('独立登录配置正在使用中，或上次操作留下了锁；请停止其他授权进程后检查。');
+            }
+            try {
+              const stat = await lstat(path);
+              if (stat.isSymbolicLink() || !stat.isDirectory()) throw new ProfileStoreError();
+            } catch (inspectionError) {
+              // The owner may release its lock after mkdir reports EEXIST.
+              // Retry acquisition; never delete or adopt the disappeared lock.
+              if (code(inspectionError) !== 'ENOENT') throw inspectionError;
             }
             await delay(50);
           }
