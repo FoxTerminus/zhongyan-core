@@ -7,6 +7,7 @@ const Environment = z.object({
   SERVER_PORT: z.coerce.number().int().min(1).max(65535).default(8787),
   AGENT_AUTH_TOKEN: z.string().min(32),
   AGENT_DATA_DIR: z.string().default('.data'),
+  AGENT_OPERATIONS_DIR: z.string().min(1).optional(),
   AGENT_RUNTIME: z.enum(['disabled', 'codex', 'remote']).default('disabled'),
   AGENT_RUNNER_URL: z.string().optional(),
   AGENT_RUNNER_AUTH_TOKEN: z.string().min(32).max(8192).regex(/^\S+$/).optional(),
@@ -32,7 +33,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env) {
   return { host: c.SERVER_HOST, port: c.SERVER_PORT, authToken: c.AGENT_AUTH_TOKEN,
     runnerUrl: c.AGENT_RUNTIME === 'remote' ? normalizeRunnerUrl(c.AGENT_RUNNER_URL!) : undefined,
     runnerToken: c.AGENT_RUNNER_AUTH_TOKEN, runnerTurnTimeoutMs: c.AGENT_RUNNER_TURN_TIMEOUT_MS, runnerMaxOutputBytes: c.AGENT_RUNNER_MAX_OUTPUT_BYTES,
-    dataDir: resolve(c.AGENT_DATA_DIR), runtime: c.AGENT_RUNTIME, command: c.AGENT_CODEX_COMMAND,
+    dataDir: resolve(c.AGENT_DATA_DIR), operationsDir: c.AGENT_OPERATIONS_DIR ? resolve(c.AGENT_OPERATIONS_DIR) : undefined, runtime: c.AGENT_RUNTIME, command: c.AGENT_CODEX_COMMAND,
     authMode: c.AGENT_CODEX_AUTH, planAppName: c.AGENT_CHATGPT_APP_NAME, appTitle: c.AGENT_APP_TITLE, planProfileDir: resolve(c.AGENT_CHATGPT_PROFILE_DIR ?? resolve(c.AGENT_DATA_DIR, 'plan-profile')),
     model: c.AGENT_CODEX_MODEL, knowledgeTools: c.AGENT_CODEX_KNOWLEDGE_TOOLS, allowedOrigins: c.AGENT_ALLOWED_ORIGINS.split(',').map(s => s.trim()).filter(Boolean) };
 }

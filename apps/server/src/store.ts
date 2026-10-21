@@ -50,6 +50,13 @@ export class Store {
     return conversationFrom(row);
   }
   listConversations(): Conversation[] { return (this.db.prepare('SELECT * FROM conversations ORDER BY updated_at DESC').all() as Row[]).map(conversationFrom); }
+  taskCounts(): { queued: number; running: number } {
+    const counts = { queued: 0, running: 0 };
+    for (const row of this.db.prepare("SELECT status, COUNT(*) AS count FROM tasks WHERE status IN ('queued','running') GROUP BY status").all() as Row[]) {
+      counts[row.status as keyof typeof counts] = Number(row.count);
+    }
+    return counts;
+  }
   snapshot(id: string) { return { conversation: this.getConversation(id), messages: this.messages(id), tasks: (this.db.prepare('SELECT * FROM tasks WHERE conversation_id=? ORDER BY rowid').all(id) as Row[]).map(taskFrom) }; }
   messages(id: string): Message[] { return (this.db.prepare("SELECT m.* FROM messages m LEFT JOIN tasks t ON t.id=m.task_id WHERE m.conversation_id=? ORDER BY t.rowid, CASE m.role WHEN 'user' THEN 0 ELSE 1 END, m.rowid").all(id) as Row[]).map(messageFrom); }
   historyBeforeTask(id: string): Pick<Message, 'role' | 'text'>[] {

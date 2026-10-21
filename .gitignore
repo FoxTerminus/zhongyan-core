@@ -20,3 +20,5 @@ apps/mobile/ios/
 artifacts/
 
 .secrets/
+
+deploy/.operations-state/

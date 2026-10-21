@@ -7,6 +7,7 @@ import { Store } from './store.js';
 import { KnowledgeStore } from './knowledge.js';
 import type { AgentRuntime } from './runtime/types.js';
 import { Worker } from './worker.js';
+import { OperationsReader } from './operations.js';
 
 interface AppOptions {
   store: Store;
@@ -15,6 +16,7 @@ interface AppOptions {
   authToken: string;
   startWorker?: boolean;
   allowedOrigins?: string[];
+  operationsDir?: string;
 }
 const IdParams = z.object({ id: z.uuid() });
 const CursorQuery = z.object({ after: z.coerce.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0) });
@@ -22,6 +24,7 @@ export function createApp(options: AppOptions) {
   if (options.authToken.length < 32) throw new Error('服务连接密钥至少需要 32 个字符。');
   const { store, runtime } = options;
   const worker = new Worker(store, runtime);
+  const operations = new OperationsReader(options.operationsDir);
   const app = Fastify({ logger: false, bodyLimit: 256 * 1024, requestTimeout: 15000 });
   const expected = createHash('sha256').update(options.authToken).digest();
   app.addHook('onRequest', async (request, reply) => {
@@ -48,6 +51,12 @@ export function createApp(options: AppOptions) {
   });
   app.get('/health', async () => ({ status: 'ok', protocolVersion: PROTOCOL_VERSION }));
   app.get('/v1/status', async () => ({ runtime: await runtime.getStatus(), protocolVersion: PROTOCOL_VERSION }));
+  app.get('/v1/operations', async request => {
+    // Reject filename/path-like query input rather than accidentally extending
+    // this endpoint into a file reader. The host publishes only fixed files.
+    z.object({}).strict().parse(request.query);
+    return operations.snapshot({ ...store.taskCounts(), workerBusy: worker.isBusy() });
+  });
   const knowledge = () => {
     if (!options.knowledge) throw new DomainError('unavailable', '资料库尚未启用。', 503);
     return options.knowledge;
@@ -67,12 +76,14 @@ export function createApp(options: AppOptions) {
   app.post('/v1/conversations/:id/messages', async (request, reply) => {
     const { id } = IdParams.parse(request.params);
     const input = SendMessageSchema.parse(request.body);
+    operations.assertAcceptingTasks();
     const result = store.enqueue(id, input.text, input.clientRequestId, input.effort);
     if (options.startWorker !== false) worker.wake();
     return reply.code(202).send(result);
   });
   app.post('/v1/tasks/:id/cancel', async request => ({ task: worker.cancel(IdParams.parse(request.params).id) }));
   app.post('/v1/tasks/:id/retry', async request => {
+    operations.assertAcceptingTasks();
     const task = store.retry(IdParams.parse(request.params).id);
     if (options.startWorker !== false) worker.wake();
     return { task };

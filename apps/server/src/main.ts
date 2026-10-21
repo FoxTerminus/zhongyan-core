@@ -29,6 +29,7 @@ const runtime = config.runtime === 'remote'
   : new DisabledRuntime();
 const app = createApp({ store: new Store(join(config.dataDir, 'agent.sqlite')), runtime,
   knowledge,
+  operationsDir: config.operationsDir,
   authToken: config.authToken, allowedOrigins: config.allowedOrigins });
 let closing = false;
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => {

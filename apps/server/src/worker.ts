@@ -8,6 +8,7 @@ export class Worker {
   private timer?: ReturnType<typeof setInterval>;
   private active?: { id: string; controller: AbortController; done: Promise<void> };
   constructor(private store: Store, private runtime: AgentRuntime, private shutdownTimeoutMs = 5000) {}
+  isBusy() { return this.busy; }
   start() {
     this.store.recoverInterrupted();
     this.timer = setInterval(() => this.wake(), 500);

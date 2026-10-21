@@ -34,11 +34,10 @@ export async function checkHealth(rootValue, dependencies = {}) {
     return '公网地址与 TLS 模式配置有效。';
   });
   if (tls) {
-    await record('certificate', async () => {
-      const certificate = await tlsProbe(tls.host, { minimumHours: 24 });
-      if (!certificate.ok) throw new OperationsError('证书临期。');
-      return { expiresAt: certificate.expiresAt, remainingHours: Math.floor(certificate.remainingHours) };
-    });
+    try {
+      const certificate = await tlsProbe(tls.host, { minimumHours: 48 });
+      checks.push({ name: 'certificate', ok: certificate.ok, detail: { expiresAt: certificate.expiresAt, remainingHours: certificate.remainingHours } });
+    } catch { checks.push({ name: 'certificate', ok: false, detail: '证书检查失败。' }); }
     await record('https-api', async () => {
       const response = await transport('https://' + tls.host + '/health', { redirect: 'error', signal: AbortSignal.timeout(10_000) });
       if (!response.ok) throw new OperationsError('HTTPS 接口未就绪。');

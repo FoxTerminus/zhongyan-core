@@ -26,9 +26,16 @@ services:
       AGENT_RUNTIME: disabled
       AGENT_AUTH_TOKEN_FILE: /run/secrets/agent_auth_token
       AGENT_ALLOWED_ORIGINS: ${AGENT_ALLOWED_ORIGINS:-}
+      AGENT_OPERATIONS_DIR: /operations
     secrets: [agent_auth_token]
     volumes:
       - agent_data:/data
+      - type: bind
+        source: ${AGENT_OPERATIONS_STATE_DIR:-./.operations-state}
+        target: /operations
+        read_only: true
+        bind:
+          create_host_path: false
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m
     networks: [backend]

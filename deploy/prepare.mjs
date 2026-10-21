@@ -1,10 +1,18 @@
 import { randomBytes } from 'node:crypto';
-import { mkdir, writeFile, copyFile, chmod } from 'node:fs/promises';
+import { mkdir, writeFile, copyFile, chmod, lstat } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export async function prepareDeployment(directory = new URL('./', import.meta.url), report = console.log) {
+  const operations = new URL('.operations-state/', directory);
+  try {
+    await mkdir(operations, { mode: 0o755 });
+    if (process.platform !== 'win32') await chmod(operations, 0o755);
+  } catch (error) { if (error.code !== 'EEXIST') throw error; }
+  // Only sanitized status files belong here; refuse links or special destinations.
+  const operationsStat = await lstat(operations);
+  if (!operationsStat.isDirectory() || operationsStat.isSymbolicLink()) throw new Error('运维状态路径须为普通目录。');
   const secrets = new URL('.secrets/', directory);
   await mkdir(secrets, { recursive: true, mode: 0o700 });
   if (process.platform !== 'win32') await chmod(secrets, 0o700);

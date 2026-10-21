@@ -5,7 +5,7 @@ import { parseArgs } from 'node:util';
 import { OperationsError, CONFIG_FILES, requireLinuxRoot, command, discovery, recipient, realDirectory, privateDirectory, createPrivateDirectory, ordinaryFile, checkSpace, digest, encryptedArchive } from './operations.mjs';
 
 /** Always attempt to restart every originally running service, even after stop/copy errors. */
-export async function withStoppedServices(services, run, snapshot) {
+export async function withStoppedServices(services, run, snapshot, afterRestart = async () => {}) {
   const running = services.filter(item => item.running);
   let result, failure;
   try {
@@ -21,6 +21,7 @@ export async function withStoppedServices(services, run, snapshot) {
     catch { startFailures.push(item.service); }
   }
   if (startFailures.length) throw new OperationsError('恢复原运行状态失败：' + startFailures.join(', ') + '。请立即检查；备份可能未完成。');
+  await afterRestart();
   if (failure) throw failure;
   return result;
 }
@@ -28,7 +29,7 @@ function below(parent, target) {
   const path = relative(parent, target);
   return path === '' || (!isAbsolute(path) && path !== '..' && !path.startsWith('../'));
 }
-export async function backupDeployment(rootValue, outputValue, recipientFile) {
+export async function backupDeployment(rootValue, outputValue, recipientFile, hooks = {}) {
   requireLinuxRoot();
   process.umask(0o077);
   const root = await realDirectory(rootValue), output = resolve(outputValue);
@@ -69,6 +70,7 @@ export async function backupDeployment(rootValue, outputValue, recipientFile) {
       services: plan.services.map(({ service, image, running }) => ({ service, image, running })),
       sourceHostMigration: 'Restore offline; a replacement VM needs its own application host identity.',
       credentialWarning: 'Rotating refresh tokens in older backups may no longer be valid.' };
+    await hooks.beforeStop?.();
     await withStoppedServices(plan.services, command, async () => {
       checkCancellation();
       for (const volume of plan.volumes) {
@@ -82,7 +84,7 @@ export async function backupDeployment(rootValue, outputValue, recipientFile) {
       await mkdir(join(stage, 'deployment/.secrets'), { recursive: true, mode: 0o700 });
       for (const file of CONFIG_FILES) await copyFile(join(root, 'deploy', file), join(stage, 'deployment', file));
       await writeFile(join(stage, 'metadata.json'), JSON.stringify(metadata, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
-    });
+    }, hooks.afterRestart);
     checkCancellation();
     // Writers have resumed; encrypt the independent immutable copy.
     const archive = join(output, 'snapshot.tar.gz.age');

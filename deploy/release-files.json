@@ -123,7 +123,13 @@
     {
       "source": "deploy/release-content/operations.md",
       "destination": "deploy/operations.md"
-    }
+    },
+    "packages/contracts/src/operations.ts",
+    "apps/server/src/operations.ts",
+    "apps/server/test/operations.test.ts",
+    "deploy/scheduled-operations.mjs",
+    "deploy/install-schedule.mjs",
+    "deploy/test/scheduled-operations.test.mjs"
   ],
   "release": {
     "license": "MIT",
