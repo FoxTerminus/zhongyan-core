@@ -25,6 +25,10 @@ function assertRouting(config, host) {
   const all = objects(config);
   const proxy = all.filter(value => value.handler === 'reverse_proxy');
   assert.equal(proxy.length, 1);
+  const https = Object.values(config.apps.http.servers).find(value => value.listen.includes(':8443'));
+  const routes = objects(https).filter(value => Array.isArray(value.match) && value.match.some(matcher => matcher.path?.includes('/internal/*')));
+  assert.equal(routes.length, 1);
+  assert.ok(objects(routes[0].handle).some(value => value.handler === 'static_response' && value.status_code === 404));
   assert.equal(proxy[0].flush_interval, -1);
   assert.deepEqual(proxy[0].upstreams, [{ dial: 'server:8787' }]);
   const redirect = all.find(value => value.status_code === 301);

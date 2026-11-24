@@ -11,6 +11,8 @@ RUN set -eu; \
     chown -R 1000:1000 /data /config
 COPY deploy/Caddyfile /etc/caddy/Caddyfile.domain
 COPY deploy/Caddyfile.ip /etc/caddy/Caddyfile.ip
+RUN chmod 0644 /etc/caddy/Caddyfile.domain /etc/caddy/Caddyfile.ip
 USER 1000:1000
+RUN AGENT_DOMAIN=8.8.8.8 caddy adapt --config /etc/caddy/Caddyfile.ip --adapter caddyfile > /dev/null
 EXPOSE 8080 8443
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile.domain", "--adapter", "caddyfile"]

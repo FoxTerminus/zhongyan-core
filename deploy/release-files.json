@@ -70,14 +70,8 @@
     "deploy/Caddy.Dockerfile.dockerignore",
     "deploy/Caddyfile",
     "deploy/Caddyfile.ip",
-    {
-      "source": "deploy/release-content/Dockerfile",
-      "destination": "deploy/Dockerfile"
-    },
-    {
-      "source": "deploy/release-content/Dockerfile.dockerignore",
-      "destination": "deploy/Dockerfile.dockerignore"
-    },
+    "deploy/Dockerfile",
+    "deploy/Dockerfile.dockerignore",
     "deploy/check-tls.mjs",
     "deploy/compose.plan.yaml",
     "deploy/compose.yaml",
@@ -88,27 +82,17 @@
     "deploy/preflight.mjs",
     "deploy/prepare.mjs",
     "deploy/read-secret.mjs",
-    "deploy/release-content/Dockerfile",
-    "deploy/release-content/Dockerfile.dockerignore",
     "deploy/release-content/LICENSE",
     "deploy/release-content/README.md",
     "deploy/release-content/ci.yml",
-    "deploy/release-content/package-lock.json",
-    "deploy/release-content/package.json",
     "deploy/release-files.json",
     "deploy/test/caddy-config.test.mjs",
     "deploy/test/package-release.test.mjs",
     "deploy/test/read-secret.test.mjs",
     "deploy/test/tls-config.test.mjs",
     "deploy/tls-config.mjs",
-    {
-      "source": "deploy/release-content/package-lock.json",
-      "destination": "package-lock.json"
-    },
-    {
-      "source": "deploy/release-content/package.json",
-      "destination": "package.json"
-    },
+    "package-lock.json",
+    "package.json",
     "packages/contracts/package.json",
     "packages/contracts/src/index.ts",
     "packages/contracts/tsconfig.json",
@@ -119,11 +103,7 @@
     "deploy/restore.mjs",
     "deploy/check-health.mjs",
     "deploy/test/operations.test.mjs",
-    "deploy/release-content/operations.md",
-    {
-      "source": "deploy/release-content/operations.md",
-      "destination": "deploy/operations.md"
-    },
+    "deploy/operations.md",
     "packages/contracts/src/operations.ts",
     "apps/server/src/operations.ts",
     "apps/server/test/operations.test.ts",
@@ -132,7 +112,9 @@
     "deploy/test/scheduled-operations.test.mjs",
     "packages/contracts/src/notifications.ts",
     "apps/server/src/notifications.ts",
-    "apps/server/test/notifications.test.ts"
+    "apps/server/test/notifications.test.ts",
+    "scripts/lab3/preference-experiment.mjs",
+    "scripts/test/lab3-preferences.test.mjs"
   ],
   "release": {
     "license": "MIT",

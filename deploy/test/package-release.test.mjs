@@ -263,8 +263,8 @@ test('checked-in core release graph has matching lockfile, both workspaces and a
   const entries = validateAllowlist(raw);
   const destinations = new Set(entries.map(entry => entry.destination));
   for (const entry of entries) assert.ok(destinations.has(entry.source), `Repackage source missing: ${entry.source}`);
-  const manifest = await readJson('deploy/release-content/package.json');
-  const lock = await readJson('deploy/release-content/package-lock.json');
+  const manifest = await readJson('package.json');
+  const lock = await readJson('package-lock.json');
   assert.deepEqual(manifest.workspaces, ['apps/server', 'packages/contracts']);
   assert.deepEqual(lock.packages[''].workspaces, manifest.workspaces);
   assert.deepEqual(lock.packages[''].devDependencies, manifest.devDependencies);
@@ -275,8 +275,8 @@ test('checked-in core release graph has matching lockfile, both workspaces and a
     assert.deepEqual(lock.packages[workspace].dependencies, source.dependencies);
   }
   assert.equal(Object.keys(lock.packages).some(name => /(?:apps\/(?:mobile|desktop))|(?:node_modules\/(?:expo|react-native|electron)(?:\/|$))/u.test(name)), false);
-  assert.equal(entries.find(entry => entry.destination === 'package.json').source, 'deploy/release-content/package.json');
-  assert.equal(entries.find(entry => entry.destination === 'package-lock.json').source, 'deploy/release-content/package-lock.json');
+  assert.equal(entries.find(entry => entry.destination === 'package.json').source, 'package.json');
+  assert.equal(entries.find(entry => entry.destination === 'package-lock.json').source, 'package-lock.json');
 });
 
 test('core allowlist covers all server and contract code without silently adding new files', async () => {
@@ -289,13 +289,11 @@ test('core allowlist covers all server and contract code without silently adding
   }
 });
 
-test('core Docker templates retain current cloud changes while removing mobile build inputs', async () => {
-  const text = async name => (await readFile(path.join(projectRoot, name), 'utf8')).replace(/^\uFEFF/u, '').replace(/\r\n/gu, '\n');
-  const expectedDocker = (await text('deploy/Dockerfile'))
-    .replace('COPY apps/mobile/package.json ./apps/mobile/package.json\n', '')
-    .replace('# Select server workspaces, with root compiler/test dependencies. Do not install\n# the mobile application merely because it lives in the same lockfile.', '# Install only the two core workspaces and their root build dependencies.')
-    .replace('# The shared mobile lockfile marks TypeScript as devOptional. Omit optional\n# packages too; the current server has no required optional runtime dependency.', '# The core runtime has no required optional dependency; keep the image minimal.');
-  assert.equal(await text('deploy/release-content/Dockerfile'), expectedDocker);
-  const expectedIgnore = (await text('deploy/Dockerfile.dockerignore')).replace('!apps/mobile/\n', '').replace('!apps/mobile/package.json\n', '');
-  assert.equal(await text('deploy/release-content/Dockerfile.dockerignore'), expectedIgnore);
+test('public image recipes use the server and contracts workspaces', async () => {
+  for (const name of ['deploy/Dockerfile', 'deploy/Dockerfile.dockerignore']) {
+    const recipe = await readFile(path.join(projectRoot, name), 'utf8');
+    assert.match(recipe, /apps\/server/u);
+    assert.match(recipe, /packages\/contracts/u);
+    assert.doesNotMatch(recipe, /apps\/mobile/u);
+  }
 });

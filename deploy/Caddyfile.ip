@@ -25,6 +25,8 @@ https://{$AGENT_DOMAIN} {
 		-Server
 		X-Content-Type-Options nosniff
 	}
+	# Model callbacks are private to the execution network.
+	respond /internal/* 404
 	reverse_proxy server:8787 {
 		flush_interval -1
 	}

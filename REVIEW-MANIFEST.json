@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 8461,
-      "sha256": "1087b31851f4e89a46e5292e6b68f32c51971a5fa55693e4bd42293457dad601"
+      "bytes": 1757,
+      "sha256": "6c17853db99307ae8f5db3b01e31160ab309091966b254809fba16fbd8d415e8"
     },
     {
       "path": "apps/server/package.json",
@@ -315,8 +315,8 @@
     },
     {
       "path": "deploy/Caddy.Dockerfile",
-      "bytes": 736,
-      "sha256": "dc0993f09eed84b94786d09b626c7aea6ae3fe617bc766615756d288dbe4d4c8"
+      "bytes": 904,
+      "sha256": "80b2d939a923911976030872ac1211d978988c80920c80d38e067760e320dc77"
     },
     {
       "path": "deploy/Caddy.Dockerfile.dockerignore",
@@ -325,13 +325,13 @@
     },
     {
       "path": "deploy/Caddyfile",
-      "bytes": 444,
-      "sha256": "8db65d88dac8245d47d5f618edb6d092d89c977a585ba4148e6ab1520f6f9623"
+      "bytes": 525,
+      "sha256": "16c1b116931ee09da32dc76435dd38e7d539e1557df334569245587b0f6d3c2b"
     },
     {
       "path": "deploy/Caddyfile.ip",
-      "bytes": 702,
-      "sha256": "1aac69df130adb983e222fdb36e5d5d14d5574ef9594af2f1702da11ad4625ad"
+      "bytes": 783,
+      "sha256": "5243cae6c20817cb911f1ddbbeffc4186328144f668e590ad81f5f4080a13973"
     },
     {
       "path": "deploy/Dockerfile",
@@ -419,24 +419,14 @@
       "sha256": "e5d93b5ea3270eda90a7062ebe0ecb71a95171f21d7908ef9db745ca0961e03b"
     },
     {
-      "path": "deploy/release-content/Dockerfile",
-      "bytes": 3389,
-      "sha256": "6aec89e3f0c0f08dcb2e691eed49c55ba2462d61926a35dc49c39aeb8fe4b8e1"
-    },
-    {
-      "path": "deploy/release-content/Dockerfile.dockerignore",
-      "bytes": 395,
-      "sha256": "aeed5aefafbf39460050639ab95af902e245e41e3dc6498bec446255305c586f"
-    },
-    {
       "path": "deploy/release-content/LICENSE",
       "bytes": 1103,
       "sha256": "f7609cddd9f331d3056618326e1e6f98a7157e2ddb7c73c0432367cd13a780f2"
     },
     {
       "path": "deploy/release-content/README.md",
-      "bytes": 8461,
-      "sha256": "1087b31851f4e89a46e5292e6b68f32c51971a5fa55693e4bd42293457dad601"
+      "bytes": 1757,
+      "sha256": "6c17853db99307ae8f5db3b01e31160ab309091966b254809fba16fbd8d415e8"
     },
     {
       "path": "deploy/release-content/ci.yml",
@@ -444,24 +434,9 @@
       "sha256": "347336986f7bc4ca74758c04e10b4a726922e5bd583166ba839ab478cf7f25f8"
     },
     {
-      "path": "deploy/release-content/operations.md",
-      "bytes": 17360,
-      "sha256": "8caaabf3bb7b615495b43ee3e35d3b2428a57a46985e491534a54cda10b02c47"
-    },
-    {
-      "path": "deploy/release-content/package-lock.json",
-      "bytes": 42730,
-      "sha256": "bbf2c24ac221b40c62a751b1f2fc21962e10bba2d8d69483b7cc0f40dae95293"
-    },
-    {
-      "path": "deploy/release-content/package.json",
-      "bytes": 987,
-      "sha256": "d53e8ac1ad2c38256a664646a6ec0dfde555ab538bf24c746ebbe9e60e6bcd80"
-    },
-    {
       "path": "deploy/release-files.json",
-      "bytes": 4934,
-      "sha256": "2b021b2a32de777ddc6120143bd5415e79905a9dc31153872d2577aaf8d558c6"
+      "bytes": 4361,
+      "sha256": "dbc07477f75aaa54deed0cedaa1a4d1e7b538bbafcacc621e22f0f1ee1f092fc"
     },
     {
       "path": "deploy/restore.mjs",
@@ -475,8 +450,8 @@
     },
     {
       "path": "deploy/test/caddy-config.test.mjs",
-      "bytes": 3953,
-      "sha256": "fb551757a541e879f41d3faaaac13776a17d9edd5116aee1f341c6a6744b9f26"
+      "bytes": 4356,
+      "sha256": "83e3c8eb9bd9ab0599804009a1ada3112f6ccde8d0c31638135342ba12e267c5"
     },
     {
       "path": "deploy/test/operations.test.mjs",
@@ -485,8 +460,8 @@
     },
     {
       "path": "deploy/test/package-release.test.mjs",
-      "bytes": 20970,
-      "sha256": "7926f01c738961ea22a5f8101e0d8142a7978769cb1b06960a5274bc3dc2d525"
+      "bytes": 20057,
+      "sha256": "c079249c140bc27513886c24eb6f0ed48a390559f9ddffc7a417b604fac72965"
     },
     {
       "path": "deploy/test/read-secret.test.mjs",
@@ -544,6 +519,11 @@
       "sha256": "63d9f8fabb0e50a41e6478384c7837479a901f45b9df67c68af0dd8fc63ecf37"
     },
     {
+      "path": "scripts/lab3/preference-experiment.mjs",
+      "bytes": 4609,
+      "sha256": "9872306fd4da4a83db9b1a54a149cb8657eabd4764942d6a26f95ab6efe2267f"
+    },
+    {
       "path": "scripts/server.mjs",
       "bytes": 848,
       "sha256": "59e2e8e589284164dcc86cf963e7fcc60671758546703551607902364a104ef4"
@@ -552,6 +532,11 @@
       "path": "scripts/setup.mjs",
       "bytes": 962,
       "sha256": "2b044798555ba7e53b75208eedfebf82e0c7153fbcff641fac62f83a561908fd"
+    },
+    {
+      "path": "scripts/test/lab3-preferences.test.mjs",
+      "bytes": 1746,
+      "sha256": "bc760f76387330dd88ba14c0ed78872eb1ae02afd33d65a475902eb7a65a979e"
     }
   ]
 }
